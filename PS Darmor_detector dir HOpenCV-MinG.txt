@@ -1,0 +1,966 @@
+PS D:\armor_detector> dir "H:\OpenCV-MinGW-Build-OpenCV-4.5.2-x64\x64\mingw"
+
+
+    目录: H:\OpenCV-MinGW-Build-OpenCV-4.5.2-x64\x64\mingw
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        2025-11-21     11:12                bin
+d-----        2025-11-21     11:12                lib
+
+
+PS D:\armor_detector> dir "H:\OpenCV-MinGW-Build-OpenCV-4.5.2-x64\x64\mingw\lib"
+
+
+    目录: H:\OpenCV-MinGW-Build-OpenCV-4.5.2-x64\x64\mingw\lib
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        2025-11-21     11:11         360518 libopencv_calib3d452.dll.a
+-a----        2025-11-21     11:11        1789338 libopencv_core452.dll.a
+-a----        2025-11-21     11:11         564580 libopencv_dnn452.dll.a
+-a----        2025-11-21     11:11         429810 libopencv_features2d452.dll.a
+-a----        2025-11-21     11:11         261536 libopencv_flann452.dll.a
+-a----        2025-11-21     11:11         941534 libopencv_gapi452.dll.a
+-a----        2025-11-21     11:11         300790 libopencv_highgui452.dll.a
+-a----        2025-11-21     11:11         235202 libopencv_imgcodecs452.dll.a
+-a----        2025-11-21     11:11         502580 libopencv_imgproc452.dll.a
+-a----        2025-11-21     11:11         278164 libopencv_ml452.dll.a
+-a----        2025-11-21     11:11         328624 libopencv_objdetect452.dll.a
+-a----        2025-11-21     11:11         347026 libopencv_photo452.dll.a
+-a----        2025-11-21     11:11         767608 libopencv_stitching452.dll.a
+-a----        2025-11-21     11:11         397060 libopencv_video452.dll.a
+-a----        2025-11-21     11:11         316536 libopencv_videoio452.dll.a
+-a----        2025-11-21     11:11            418 OpenCVConfig-version.cmake
+-a----        2025-11-21     11:11          14700 OpenCVConfig.cmake
+-a----        2025-11-21     11:11           9225 OpenCVModules-release.cmake
+-a----        2025-11-21     11:11           6400 OpenCVModules.cmake
+
+
+PS D:\armor_detector> dir "H:\OpenCV-MinGW-Build-OpenCV-4.5.2-x64\x64\mingw\lib\OpenCVConfig.cmake"
+
+
+    目录: H:\OpenCV-MinGW-Build-OpenCV-4.5.2-x64\x64\mingw\lib
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        2025-11-21     11:11          14700 OpenCVConfig.cmake
+
+
+PS D:\armor_detector> cmake -DOpenCV_DIR="H:/OpenCV-MinGW-Build-OpenCV-4.5.2-x64/x64/mingw/lib" -S . -B build
+-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.26200.
+-- Found OpenCV: H:/OpenCV-MinGW-Build-OpenCV-4.5.2-x64 (found suitable version "4.5.2", minimum required is "4")
+-- Configuring done (0.1s)
+-- Generating done (0.3s)
+-- Build files have been written to: D:/armor_detector/build
+PS D:\armor_detector> cmake --build build --config Release
+适用于 .NET Framework MSBuild 版本 17.13.19+0d9f5a35a
+
+  1>Checking Build System
+  Building Custom Rule D:/armor_detector/CMakeLists.txt
+cl : 命令行  error D8021: 无效的数值参数“/Wextra” [D:\armor_detector\build\armor_detector.vcxproj]
+PS D:\armor_detector> cmake --build build --config Release
+CMake is re-running because D:/armor_detector/build/CMakeFiles/generate.stamp is out-of-date.
+  the file 'D:/armor_detector/CMakeLists.txt'
+  is newer than 'D:/armor_detector/build/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.26200.
+-- Configuring done (0.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: D:/armor_detector/build
+适用于 .NET Framework MSBuild 版本 17.13.19+0d9f5a35a
+
+  main.cpp
+D:\armor_detector\src\main.cpp(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失 [D:\armor_detector\build\armor_detector.vcxproj]
+  (编译源文件“../src/main.cpp”)
+
+D:\armor_detector\src\main.cpp(21,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(22,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(24,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(25,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(26,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(28,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(29,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(30,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(38,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(39,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(42,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(43,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(43,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(44,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(44,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(45,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(45,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(47,14): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(53,26): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\main.cpp(54,13): error C2143: 语法错误: 缺少“;”(在“return”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+  ArmorDetector.cpp
+D:\armor_detector\src\ArmorDetector.cpp(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失 [D:\armor_detector\build\armor_detector.vcxproj
+]
+D:\armor_detector\src\ArmorDetector.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失 [D:\armor_detector\build\armor_detector.vcxproj]
+  (编译源文件“../src/ArmorDetector.cpp”)
+
+D:\armor_detector\src\ArmorDetector.cpp(46,22): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(47,5): error C2143: 语法错误: 缺少“;”(在“}”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(203,28): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(298,28): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(583,62): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(584,5): error C2143: 语法错误: 缺少“;”(在“}”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(591,18): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(592,1): error C2143: 语法错误: 缺少“;”(在“}”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(629,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失 [D:\armor_detector\build\armor_detector.vcxpr
+oj]
+D:\armor_detector\src\ArmorDetector.cpp(673,18): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(674,10): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(682,18): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(683,10): error C2143: 语法错误: 缺少“;”(在“std::cout”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(719,20): error C2001: 常量中有换行符 [D:\armor_detector\build\armor_detector.vcxproj]
+D:\armor_detector\src\ArmorDetector.cpp(722,9): error C2143: 语法错误: 缺少“)”(在“if”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+  正在生成代码...
+D:\armor_detector\src\ArmorDetector.cpp(719,13): error C2661: “cv::imshow”: 没有重载函数接受 1 个参数 [D:\armor_detector\build\armor_detector.vcxproj]
+      D:\armor_detector\src\ArmorDetector.cpp(719,13):
+      尝试匹配参数列表“(const char [25])”时
+
+D:\armor_detector\src\ArmorDetector.cpp(722,9): error C2143: 语法错误: 缺少“;”(在“if”的前面) [D:\armor_detector\build\armor_detector.vcxproj]
+PS D:\armor_detector> file d:\armor_detector\src\main.cpp
+file : 无法将“file”项识别为 cmdlet、函数、脚本文件或可运行程序的名称。请检查名称的拼写，如果包括路径，请确保路径正确，然后再试一次。
+所在位置 行:1 字符: 1
++ file d:\armor_detector\src\main.cpp
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (file:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS D:\armor_detector> Get-Content d:\armor_detector\src\main.cpp -Encoding String | Measure-Object -Character
+
+Lines Words Characters Property
+----- ----- ---------- --------
+                  2599
+
+
+PS D:\armor_detector> Get-Content d:\armor_detector\src\main.cpp -Raw | Out-String -Stream | Select-Object -First 5
+// src/main.cpp
+#include "ArmorDetector.h"
+#include <iostream>
+
+int main(int argc, char* argv[]) {
+    try {
+        std::cout << "===========================================" << std::endl;
+        std::cout << "     RoboMaster瑁呯敳鏉胯瘑鍒郴缁?v1.0" << std::endl;
+        std::cout << "===========================================" << std::endl;
+
+        int camera_id = 0;
+        if (argc > 1) {
+            camera_id = std::atoi(argv[1]);
+            std::cout << "浣跨敤鎽勫儚澶碔D: " << camera_id << std::endl;
+        } else {
+            std::cout << "浣跨敤榛樿鎽勫儚澶碔D: 0" << std::endl;
+        }
+
+        std::cout << "\n鍔熻兘璇存槑:" << std::endl;
+        std::cout << "- 瀹炴椂璇嗗埆绾㈣壊鍜岃摑鑹茶鐢叉澘" << std::endl;
+        std::cout << "- 绮剧‘璁＄畻瑁呯敳鏉夸腑蹇冨潗鏍? << std::endl;
+        std::cout << "- 鍙鍖朥I鏄剧ず璇嗗埆缁撴灉" << std::endl;
+        std::cout << "- 鏀寔鍙傛暟璋冭妭闈㈡澘瀹炴椂璋冨弬" << std::endl;
+        std::cout << "- 鏀寔鐩告満鍙傛暟璋冭妭锛堟洕鍏夋椂闂淬€丷GB澧炵泭锛? << std::endl;
+        std::cout << "- 鏀寔蹇棬閫熷害棰勮鍔熻兘" << std::endl;
+        std::cout << "- 鏀寔鍥炲悎鍒惰瘑鍒帶鍒? << std::endl;
+
+        std::cout << "\n鎿嶄綔璇存槑:" << std::endl;
+        std::cout << "- Q閿? 閫€鍑虹▼搴? << std::endl;
+        std::cout << "- S閿? 鍒囨崲UI鏄剧ず/闅愯棌" << std::endl;
+        std::cout << "- B閿? 鍒囨崲浜屽€煎寲鍥惧儚鏄剧ず" << std::endl;
+        std::cout << "- R閿? 寮€濮嬫柊鍥炲悎" << std::endl;
+        std::cout << "- A閿? 鍏佽璇嗗埆" << std::endl;
+        std::cout << "- F閿? 瀹屾垚璇嗗埆" << std::endl;
+        std::cout << "- 1閿? 鏄庝寒鐜蹇棬閫熷害" << std::endl;
+        std::cout << "- 2閿? 姝ｅ父鐜蹇棬閫熷害" << std::endl;
+        std::cout << "- 3閿? 榛戞殫鐜蹇棬閫熷害" << std::endl;
+        std::cout << "- P閿? 淇濆瓨褰撳墠鍙傛暟涓洪璁? << std::endl;
+        std::cout << "- 婊戝姩鏉? 璋冭妭璇嗗埆鍙傛暟" << std::endl;
+
+        std::cout << "\n姣旇禌娴佺▼:" << std::endl;
+        std::cout << "鍑嗗闃舵: 璋冭妭鍙傛暟閫傚簲鐜鍏夌収锛岃缃璁惧弬鏁? << std::endl;
+        std::cout << "姝ｅ紡姣旇禌: 姣忓洖鍚堟渶澶氭墽琛屼袱娆¤瘑鍒换鍔? << std::endl;
+        std::cout << "  1. 绗竴娆¤瘑鍒? 鍥炲悎寮€濮嬫椂瑁呯敳鏉跨偣浜? << std::endl;
+        std::cout << "  2. 绗簩娆¤瘑鍒? 鍏戞崲鍖虹敵璇凤紝鎴愬姛璇嗗埆鍙幏寰楅澶栧鐩? << std::endl;
+
+        std::cout << "\n鍑嗗闃舵璇疯皟鑺傚弬鏁颁互閫傚簲鐜鍏夌収..." << std::endl;
+        std::cout << "===========================================" << std::endl;
+
+        ArmorDetector detector(camera_id);
+
+        if (!detector.initialize()) {
+            std::cerr << "绋嬪簭鍒濆鍖栧け璐? 璇锋鏌ユ憚鍍忓ご杩炴帴銆? << std::endl;
+            return -1;
+        }
+
+        detector.run();
+    } catch (const std::exception& e) {
+        std::cerr << "绋嬪簭鍙戠敓閿欒: " << e.what() << std::endl;
+        return -1;
+    } catch (...) {
+        std::cerr << "绋嬪簭鍙戠敓鏈煡閿欒!" << std::endl;
+        return -1;
+    }
+
+    return 0;
+}
+PS D:\armor_detector> Get-Content d:\armor_detector\src\ArmorDetector.cpp -Raw | Out-String -Stream | Select-Object -First 5
+// src/ArmorDetector.cpp
+#include <opencv2/opencv.hpp>
+#include "ArmorDetector.h"
+#include <iostream>
+#include <ctime>
+
+ArmorDetector::ArmorDetector(int camera_id) :
+    hue_low_red1(0), saturation_low_red1(100), value_low_red1(100),
+    hue_high_red1(10), saturation_high_red1(255), value_high_red1(255),
+    hue_low_red2(170), saturation_low_red2(100), value_low_red2(100),
+    hue_high_red2(180), saturation_high_red2(255), value_high_red2(255),
+    hue_low_blue(90), saturation_low_blue(100), value_low_blue(100),
+    hue_high_blue(130), saturation_high_blue(255), value_high_blue(255),
+    min_area(OPTIMAL_MIN_AREA), max_area(OPTIMAL_MAX_AREA),
+    min_ratio(OPTIMAL_MIN_RATIO), max_ratio(OPTIMAL_MAX_RATIO),
+    min_distance(OPTIMAL_MIN_DISTANCE), max_distance(OPTIMAL_MAX_DISTANCE),
+    max_angle_diff(20), max_height_diff_ratio(30),
+    exposure_time(DEFAULT_EXPOSURE_TIME), r_gain(10), g_gain(10), b_gain(10),
+    preset_exposure_bright(1000), preset_exposure_normal(5000), preset_exposure_dark(20000),
+    show_ui(true), is_camera_opened(false), show_binary(false),
+    round_count(0), recognition_count(0), is_recognition_allowed(false), recognition_mode(0) {
+
+    updateColorRanges();
+
+    // 灏濊瘯鎵撳紑鎽勫儚澶?
+    cap.open(camera_id);
+    if (cap.isOpened()) {
+        is_camera_opened = true;
+        std::cout << "鎽勫儚澶村凡鎴愬姛鎵撳紑" << std::endl;
+
+        // 璁剧疆DF100鐩告満鍙傛暟
+        cap.set(cv::CAP_PROP_FRAME_WIDTH, CAMERA_WIDTH);
+        cap.set(cv::CAP_PROP_FRAME_HEIGHT, CAMERA_HEIGHT);
+        cap.set(cv::CAP_PROP_FPS, CAMERA_FPS);
+
+        // 璁剧疆鍒濆鏇濆厜鏃堕棿
+        cap.set(cv::CAP_PROP_EXPOSURE, exposure_time);
+
+        // 杈撳嚭鐩告満瀹為檯璁剧疆
+        std::cout << "DF100鐩告満璁剧疆:" << std::endl;
+        std::cout << "  鍒嗚鲸鐜? " << cap.get(cv::CAP_PROP_FRAME_WIDTH)
+                  << "脳" << cap.get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
+        std::cout << "  甯х巼: " << cap.get(cv::CAP_PROP_FPS) << " FPS" << std::endl;
+        std::cout << "  鏇濆厜鏃堕棿: " << cap.get(cv::CAP_PROP_EXPOSURE) << " 寰" << std::endl;
+    } else {
+        std::cerr << "鏃犳硶鎵撳紑鎽勫儚澶达紝璇锋鏌ヨ澶囪繛鎺? << std::endl;
+    }
+}
+
+ArmorDetector::~ArmorDetector() {
+    if (cap.isOpened()) {
+        cap.release();
+    }
+    cv::destroyAllWindows();
+}
+
+bool ArmorDetector::initialize() {
+    return is_camera_opened;
+}
+
+void ArmorDetector::updateColorRanges() {
+    lower_red1 = cv::Scalar(hue_low_red1, saturation_low_red1, value_low_red1);
+    upper_red1 = cv::Scalar(hue_high_red1, saturation_high_red1, value_high_red1);
+    lower_red2 = cv::Scalar(hue_low_red2, saturation_low_red2, value_low_red2);
+    upper_red2 = cv::Scalar(hue_high_red2, saturation_high_red2, value_high_red2);
+    lower_blue = cv::Scalar(hue_low_blue, saturation_low_blue, value_low_blue);
+    upper_blue = cv::Scalar(hue_high_blue, saturation_high_blue, value_high_blue);
+}
+
+void ArmorDetector::updateCameraParams() {
+    // 浠庢粦鍔ㄦ潯鑾峰彇鏇濆厜鏃堕棿鍊煎苟鏄犲皠鍥炲疄闄呭€?
+    int exposure_slider = cv::getTrackbarPos("MVExpTime", "鍙傛暟璋冭妭");
+    exposure_time = exposure_slider * 100;
+
+    // 纭繚鏇濆厜鏃堕棿鍦ㄦ湁鏁堣寖鍥村唴
+    exposure_time = std::max(MIN_EXPOSURE_TIME, std::min(exposure_time, MAX_EXPOSURE_TIME));
+
+    // 璁剧疆鏇濆厜鏃堕棿 (-1琛ㄧず鑷姩鏇濆厜)
+    cap.set(cv::CAP_PROP_EXPOSURE, exposure_time);
+
+    // 灏嗗疄闄呰缃殑鏇濆厜鏃堕棿鍊煎悓姝ュ洖婊戝姩鏉℃樉绀?
+    cv::setTrackbarPos("MVExpTime", "鍙傛暟璋冭妭", exposure_time / 100);
+
+    // 娉ㄦ剰锛氬鐩婂弬鏁拌缃緷璧栦簬鍏蜂綋鎽勫儚澶撮┍鍔ㄦ敮鎸?
+    // 杩欓噷鎻愪緵鎺ュ彛浣嗗彲鑳藉湪鏌愪簺鎽勫儚澶翠腑涓嶇敓鏁?
+    cap.set(cv::CAP_PROP_GAIN, (r_gain + g_gain + b_gain) / 3.0);
+
+    // 灏濊瘯璁剧疆鐧藉钩琛″鐩婏紙濡傛灉鎽勫儚澶存敮鎸侊級
+    // 杩欎簺灞炴€D鍙兘鍥犳憚鍍忓ご鑰屽紓
+    cap.set(40, r_gain);  // PROP_WHITE_BALANCE_RED_V
+    cap.set(41, g_gain);  // PROP_WHITE_BALANCE_GREEN
+    cap.set(42, b_gain);  // PROP_WHITE_BALANCE_BLUE
+}
+
+void ArmorDetector::createTrackbars() {
+    cv::namedWindow("鍙傛暟璋冭妭", cv::WINDOW_AUTOSIZE);
+
+    // 绾㈣壊闃堝€艰皟鑺?
+    cv::createTrackbar("Red H Low 1", "鍙傛暟璋冭妭", &hue_low_red1, 180);
+    cv::createTrackbar("Red S Low 1", "鍙傛暟璋冭妭", &saturation_low_red1, 255);
+    cv::createTrackbar("Red V Low 1", "鍙傛暟璋冭妭", &value_low_red1, 255);
+    cv::createTrackbar("Red H High 1", "鍙傛暟璋冭妭", &hue_high_red1, 180);
+    cv::createTrackbar("Red S High 1", "鍙傛暟璋冭妭", &saturation_high_red1, 255);
+    cv::createTrackbar("Red V High 1", "鍙傛暟璋冭妭", &value_high_red1, 255);
+
+    cv::createTrackbar("Red H Low 2", "鍙傛暟璋冭妭", &hue_low_red2, 180);
+    cv::createTrackbar("Red S Low 2", "鍙傛暟璋冭妭", &saturation_low_red2, 255);
+    cv::createTrackbar("Red V Low 2", "鍙傛暟璋冭妭", &value_low_red2, 255);
+    cv::createTrackbar("Red H High 2", "鍙傛暟璋冭妭", &hue_high_red2, 180);
+    cv::createTrackbar("Red S High 2", "鍙傛暟璋冭妭", &saturation_high_red2, 255);
+    cv::createTrackbar("Red V High 2", "鍙傛暟璋冭妭", &value_high_red2, 255);
+
+    // 钃濊壊闃堝€艰皟鑺?
+    cv::createTrackbar("Blue H Low", "鍙傛暟璋冭妭", &hue_low_blue, 180);
+    cv::createTrackbar("Blue S Low", "鍙傛暟璋冭妭", &saturation_low_blue, 255);
+    cv::createTrackbar("Blue V Low", "鍙傛暟璋冭妭", &value_low_blue, 255);
+    cv::createTrackbar("Blue H High", "鍙傛暟璋冭妭", &hue_high_blue, 180);
+    cv::createTrackbar("Blue S High", "鍙傛暟璋冭妭", &saturation_high_blue, 255);
+    cv::createTrackbar("Blue V High", "鍙傛暟璋冭妭", &value_high_blue, 255);
+
+    // 褰㈢姸杩囨护鍙傛暟
+    cv::createTrackbar("Min Area", "鍙傛暟璋冭妭", &min_area, 1000);
+    cv::createTrackbar("Max Area", "鍙傛暟璋冭妭", &max_area, 10000);
+
+    // 瑁呯敳鏉垮尮閰嶅弬鏁?
+    cv::createTrackbar("Min Distance", "鍙傛暟璋冭妭", &min_distance, 200);
+    cv::createTrackbar("Max Distance", "鍙傛暟璋冭妭", &max_distance, 1000);
+    cv::createTrackbar("Max Angle Diff", "鍙傛暟璋冭妭", &max_angle_diff, 90);
+    cv::createTrackbar("Max Height Diff %", "鍙傛暟璋冭妭", &max_height_diff_ratio, 100);
+
+    // 鐩告満鍙傛暟璋冭妭
+    // MVExpTime鑼冨洿璁剧疆涓?-100000寰锛屾粦鍔ㄦ潯鍊奸渶瑕佹槧灏?
+    cv::createTrackbar("MVCameraDebug", "鍙傛暟璋冭妭", nullptr, 1000);
+    cv::setTrackbarPos("MVCameraDebug", "鍙傛暟璋冭妭", exposure_time / 100);
+
+    cv::createTrackbar("MVExpTime", "鍙傛暟璋冭妭", nullptr, 1000);
+    cv::setTrackbarPos("MVExpTime", "鍙傛暟璋冭妭", exposure_time / 100);
+
+    cv::createTrackbar("r_gain", "鍙傛暟璋冭妭", &r_gain, 100);
+    cv::createTrackbar("g_gain", "鍙傛暟璋冭妭", &g_gain, 100);
+    cv::createTrackbar("b_gain", "鍙傛暟璋冭妭", &b_gain, 100);
+
+    // 蹇棬閫熷害棰勮 (鏄犲皠鍒版粦鍔ㄦ潯鑼冨洿)
+    cv::createTrackbar("Preset Bright", "鍙傛暟璋冭妭", nullptr, 1000);
+    cv::setTrackbarPos("Preset Bright", "鍙傛暟璋冭妭", preset_exposure_bright / 100);
+
+    cv::createTrackbar("Preset Normal", "鍙傛暟璋冭妭", nullptr, 1000);
+    cv::setTrackbarPos("Preset Normal", "鍙傛暟璋冭妭", preset_exposure_normal / 100);
+
+    cv::createTrackbar("Preset Dark", "鍙傛暟璋冭妭", nullptr, 1000);
+    cv::setTrackbarPos("Preset Dark", "鍙傛暟璋冭妭", preset_exposure_dark / 100);
+
+    // 娓告垙鎺у埗鍙傛暟
+    cv::createTrackbar("Recognition Mode", "鍙傛暟璋冭妭", &recognition_mode, 2);
+}
+
+cv::Mat ArmorDetector::preprocess(const cv::Mat& src) {
+    cv::Mat blurred, hsv_image;
+
+    // 鏍规嵁鍥惧儚澶у皬璋冩暣楂樻柉妯＄硦鏍稿ぇ灏?
+    int kernel_size = std::max(3, std::min(src.cols, src.rows) / 200);
+    if (kernel_size % 2 == 0) kernel_size++; // 纭繚鏍稿ぇ灏忎负濂囨暟
+
+    // 楂樻柉妯＄硦鍘诲櫔
+    cv::GaussianBlur(src, blurred, cv::Size(kernel_size, kernel_size), 0);
+
+    // 杞崲鍒癏SV棰滆壊绌洪棿
+    cv::cvtColor(blurred, hsv_image, cv::COLOR_BGR2HSV);
+
+    return hsv_image;
+}
+
+// 鐏潯鐗瑰緛绛涢€?- 鍙傝€僐oboMaster 2018 SEU妗堜緥杩涜浼樺寲
+bool ArmorDetector::isLightBar(const std::vector<cv::Point>& contour) {
+    double area = cv::contourArea(contour);
+    if (area < 50 || area > 5000) return false; // 闈㈢Н绛涢€?
+    cv::RotatedRect rect = cv::minAreaRect(contour);
+    float width = rect.size.width;
+    float height = rect.size.height;
+    if (width < height) std::swap(width, height);
+    float aspect_ratio = width / height;
+    // 璋冩暣闀垮姣旇寖鍥达紝鍙傝€僐oboMaster 2018妗堜緥
+    if (aspect_ratio < 2.5 || aspect_ratio > 12) return false; // 闀垮姣旂瓫閫?
+    return true;
+}
+
+// 瑁呯敳鏉块厤瀵?- 鍙傝€僐oboMaster 2018 SEU妗堜緥杩涜浼樺寲
+std::vector<cv::Point2f> ArmorDetector::pairLightBars(const std::vector<cv::RotatedRect>& light_bars) {
+    std::vector<cv::Point2f> armor_centers;
+    for (size_t i = 0; i < light_bars.size(); i++) {
+        for (size_t j = i + 1; j < light_bars.size(); j++) {
+            cv::Point2f center1 = light_bars[i].center;
+            cv::Point2f center2 = light_bars[j].center;
+            cv::RotatedRect rect1 = light_bars[i];
+            cv::RotatedRect rect2 = light_bars[j];
+
+            // 璁＄畻鐏潯楂樺害
+            float height1 = std::max(rect1.size.width, rect1.size.height);
+            float height2 = std::max(rect2.size.width, rect2.size.height);
+            float min_height = std::min(height1, height2);
+
+            // 璁＄畻涓や釜鐏潯涔嬮棿鐨勮窛绂?
+            float distance = cv::norm(center1 - center2);
+
+            // 璺濈搴斾笌鐏潯楂樺害鎴愭瘮渚?
+            if (distance < 2 * min_height || distance > 8 * min_height) {
+                continue;
+            }
+
+            // 璁＄畻瑙掑害宸紙鑰冭檻OpenCV涓搴︾殑鐗规畩鎬э級
+            float angle1 = rect1.angle;
+            float angle2 = rect2.angle;
+            if (angle1 < -45) angle1 += 90;
+            if (angle2 < -45) angle2 += 90;
+            float angle_diff = std::abs(angle1 - angle2);
+            if (angle_diff > 15) {
+                continue;
+            }
+
+            // 璁＄畻姘村钩鍜屽瀭鐩磋窛绂?
+            float horizontal_dist = std::abs(center1.x - center2.x);
+            float vertical_dist = std::abs(center1.y - center2.y);
+            // 姘村钩璺濈搴斿ぇ浜庡瀭鐩磋窛绂伙紙瑁呯敳鏉块€氬父鏄按骞虫帓鍒楋級
+            if (horizontal_dist < vertical_dist) {
+                continue;
+            }
+
+            // 璁＄畻瑁呯敳鏉夸腑蹇?
+            cv::Point2f armor_center((center1.x + center2.x) / 2,
+                (center1.y + center2.y) / 2);
+            armor_centers.push_back(armor_center);
+        }
+    }
+    return armor_centers;
+}
+
+std::vector<std::vector<cv::Point>> ArmorDetector::findContoursByColor(const cv::Mat& hsv_image, const std::string& color) {
+    cv::Mat mask, mask1, mask2;
+
+    if (color == "red") {
+        // 绾㈣壊鍦℉SV涓垎甯冨湪涓ょ锛岄渶瑕佷袱涓寖鍥?
+        cv::inRange(hsv_image, lower_red1, upper_red1, mask1);
+        cv::inRange(hsv_image, lower_red2, upper_red2, mask2);
+        cv::add(mask1, mask2, mask);
+    } else if (color == "blue") {
+        cv::inRange(hsv_image, lower_blue, upper_blue, mask);
+    }
+
+    // 鏍规嵁鍥惧儚澶у皬璋冩暣褰㈡€佸鎿嶄綔鏍稿ぇ灏?
+    int kernel_size = std::max(3, std::min(hsv_image.cols, hsv_image.rows) / 250);
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernel_size, kernel_size));
+    cv::morphologyEx(mask, mask, cv::MORPH_OPEN, kernel);
+    cv::morphologyEx(mask, mask, cv::MORPH_CLOSE, kernel);
+
+    // 鏌ユ壘杞粨
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(mask, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    // 鏍规嵁闈㈢Н鍜屽舰鐘惰繃婊よ疆寤?
+    std::vector<std::vector<cv::Point>> filtered_contours;
+    for (const auto& contour : contours) {
+        double area = cv::contourArea(contour);
+        if (area > min_area && area < max_area) {
+            // 璁＄畻杞粨鐨勮竟鐣岀煩褰?
+            cv::Rect bounding_rect = cv::boundingRect(contour);
+            double ratio = static_cast<double>(bounding_rect.height) / bounding_rect.width;
+
+            // 鏍规嵁闀垮姣旇繃婊わ紝鐏潯搴旇鏄珫鐩寸殑缁嗛暱褰㈢姸
+            if (ratio > min_ratio && ratio < max_ratio) {
+                filtered_contours.push_back(contour);
+            }
+        }
+    }
+
+    return filtered_contours;
+}
+
+void ArmorDetector::matchArmorPairs(const std::vector<std::vector<cv::Point>>& contours,
+                                  const std::string& color,
+                                  std::vector<ArmorInfo>& armors) {
+    // 瑁呯敳鏉垮尮閰嶇畻娉曪細瀵绘壘鐩歌繎楂樺害鍜岃搴︾殑鐏潯瀵?
+    for (size_t i = 0; i < contours.size(); ++i) {
+        cv::RotatedRect rect1 = cv::minAreaRect(contours[i]);
+
+        for (size_t j = i + 1; j < contours.size(); ++j) {
+            cv::RotatedRect rect2 = cv::minAreaRect(contours[j]);
+
+            // 鑾峰彇鐏潯鐨勮搴︼紙OpenCV涓搴﹁寖鍥翠负[-90,0)锛?
+            float angle1 = rect1.angle;
+            float angle2 = rect2.angle;
+
+            // 鑾峰彇鐏潯鐨勪腑蹇冪偣
+            cv::Point2f center1 = rect1.center;
+            cv::Point2f center2 = rect2.center;
+
+            // 璁＄畻涓ょ伅鏉′箣闂寸殑璺濈
+            float distance = cv::norm(center1 - center2);
+
+            // 淇瑙掑害宸绠楋紙鑰冭檻OpenCV瑙掑害鐗规€э級
+            float angle_diff = std::abs(angle1 - angle2);
+            // 瀵逛簬鎺ヨ繎-90搴︾殑鎯呭喌锛岄渶瑕佺壒娈婂鐞?
+            if (angle_diff > 45) {
+                angle_diff = 90 - angle_diff;
+            }
+
+            // 璁＄畻鐏潯鐨勯珮搴?
+            float height1 = std::max(rect1.size.width, rect1.size.height);
+            float height2 = std::max(rect2.size.width, rect2.size.height);
+
+            // 璁＄畻楂樺害宸瘮鐜?
+            float height_diff_ratio = std::abs(height1 - height2) / std::max(height1, height2) * 100;
+
+            // 璁＄畻姘村钩璺濈涓庡瀭鐩磋窛绂绘鏌?
+            float horizontal_dist = std::abs(center1.x - center2.x);
+            float vertical_dist = std::abs(center1.y - center2.y);
+
+            // 鍖归厤鏉′欢澧炲己锛?
+            // 1. 瑙掑害宸皬浜庨槇鍊?
+            // 2. 楂樺害宸瘮鐜囧皬浜庨槇鍊?
+            // 3. 璺濈鍦ㄥ悎鐞嗚寖鍥村唴
+            // 4. 姘村钩璺濈搴斿ぇ浜庡瀭鐩磋窛绂伙紙瑁呯敳鏉块€氬父鏄按骞虫帓鍒楋級
+            // 5. 瀹介珮姣斿悎鐞嗘€ф鏌?
+            if (angle_diff < max_angle_diff &&
+                height_diff_ratio < max_height_diff_ratio &&
+                distance > min_distance &&
+                distance < max_distance &&
+                horizontal_dist > vertical_dist) {
+
+                // 纭畾瑁呯敳鏉跨殑杈圭晫妗?
+                std::vector<cv::Point2f> points;
+                cv::Point2f pts1[4], pts2[4];
+                rect1.points(pts1);
+                rect2.points(pts2);
+
+                for (int k = 0; k < 4; k++) {
+                    points.push_back(pts1[k]);
+                }
+                for (int k = 0; k < 4; k++) {
+                    points.push_back(pts2[k]);
+                }
+
+                cv::Rect bbox = cv::boundingRect(points);
+                cv::Point2f center = {(center1.x + center2.x) / 2, (center1.y + center2.y) / 2};
+
+                ArmorInfo armor;
+                armor.center = center;
+                armor.bbox = bbox;
+                armor.color = color;
+                armor.confidence = (1.0f - (angle_diff / max_angle_diff)) *
+                                  (1.0f - (height_diff_ratio / max_height_diff_ratio));
+                armor.lightBars = points;
+
+                // 淇濆瓨鐏潯鐨勬棆杞煩褰俊鎭?
+                armor.lightRects.push_back(rect1);
+                armor.lightRects.push_back(rect2);
+
+                armors.push_back(armor);
+            }
+        }
+    }
+}
+
+std::vector<ArmorDetector::ArmorInfo> ArmorDetector::matchArmors(
+    const std::vector<std::vector<cv::Point>>& red_contours,
+    const std::vector<std::vector<cv::Point>>& blue_contours) {
+
+    std::vector<ArmorInfo> armors;
+
+    // 澶勭悊绾㈣壊瑁呯敳鏉?
+    matchArmorPairs(red_contours, "red", armors);
+
+    // 澶勭悊钃濊壊瑁呯敳鏉?
+    matchArmorPairs(blue_contours, "blue", armors);
+
+    return armors;
+}
+
+void ArmorDetector::drawBinaryImages(const cv::Mat& hsv_image) {
+    cv::Mat red_mask1, red_mask2, red_mask, blue_mask, combined_mask;
+
+    // 绾㈣壊鎺╃爜
+    cv::inRange(hsv_image, lower_red1, upper_red1, red_mask1);
+    cv::inRange(hsv_image, lower_red2, upper_red2, red_mask2);
+    cv::add(red_mask1, red_mask2, red_mask);
+
+    // 钃濊壊鎺╃爜
+    cv::inRange(hsv_image, lower_blue, upper_blue, blue_mask);
+
+    // 鍚堝苟鎺╃爜鐢ㄤ簬鏄剧ず
+    std::vector<cv::Mat> channels;
+    channels.push_back(blue_mask);
+    channels.push_back(red_mask);
+    channels.push_back(cv::Mat::zeros(red_mask.size(), CV_8UC1));
+    cv::merge(channels, combined_mask);
+
+    // 鏄剧ず浜屽€煎寲鍥惧儚
+    cv::imshow("浜屽€煎寲鍥惧儚", combined_mask);
+}
+
+void ArmorDetector::drawUI(cv::Mat& image, const std::vector<ArmorInfo>& armors) {
+    // 缁樺埗鎵€鏈夎瘑鍒埌鐨勮鐢叉澘
+    for (size_t i = 0; i < armors.size(); ++i) {
+        const auto& armor = armors[i];
+
+        // 缁樺埗瑁呯敳鏉胯竟鐣屾 (绾垮鏍规嵁鍒嗚鲸鐜囪皟鏁?
+        int bbox_thickness = std::max(2, std::min(image.cols, image.rows) / 300);
+        cv::rectangle(image, armor.bbox, cv::Scalar(0, 255, 0), bbox_thickness);
+
+        // 缁樺埗涓績鐐?
+        int center_radius = std::max(3, std::min(image.cols, image.rows) / 200);
+        cv::circle(image, armor.center, center_radius, cv::Scalar(0, 0, 255), -1);
+
+        // 缁樺埗鐏潯
+        int light_thickness = std::max(1, std::min(image.cols, image.rows) / 400);
+        for (const auto& rect : armor.lightRects) {
+            cv::Point2f pts[4];
+            rect.points(pts);
+            for (int j = 0; j < 4; j++) {
+                cv::line(image, pts[j], pts[(j+1)%4], cv::Scalar(255, 0, 0), light_thickness);
+            }
+        }
+
+        // 缁樺埗璇︾粏淇℃伅闈㈡澘
+        std::string color_info = "Color: " + armor.color;
+        std::string coord_info = "Coord: (" + std::to_string(static_cast<int>(armor.center.x)) +
+                                ", " + std::to_string(static_cast<int>(armor.center.y)) + ")";
+        std::string conf_info = "Conf: " + std::to_string(armor.confidence).substr(0, 4);
+        std::string id_info = "ID: " + std::to_string(i+1);
+
+        // 鏍规嵁鍒嗚鲸鐜囪皟鏁村瓧浣撳ぇ灏忓拰闈㈡澘灏哄
+        double font_scale = std::max(0.4, std::min(image.cols, image.rows) / 1000.0);
+        int panel_width = static_cast<int>(150 * font_scale * 2.5);
+        int panel_height = static_cast<int>(80 * font_scale * 2);
+        int text_thickness = std::max(1, static_cast<int>(font_scale * 2));
+
+        cv::Point panel_top_left(armor.bbox.x, armor.bbox.y - panel_height - 10);
+        cv::Point panel_bottom_right(armor.bbox.x + panel_width, armor.bbox.y - 10);
+
+        // 纭繚淇℃伅闈㈡澘涓嶄細瓒呭嚭鍥惧儚杈圭晫
+        if (panel_top_left.x < 0) {
+            panel_top_left.x = 0;
+            panel_bottom_right.x = panel_width;
+        }
+        if (panel_bottom_right.x > image.cols) {
+            panel_bottom_right.x = image.cols;
+            panel_top_left.x = image.cols - panel_width;
+        }
+        if (panel_top_left.y < 0) {
+            panel_top_left.y = armor.bbox.y + armor.bbox.height + 10;
+            panel_bottom_right.y = panel_top_left.y + panel_height;
+        }
+
+        // 缁樺埗淇℃伅闈㈡澘鑳屾櫙
+        cv::rectangle(image, panel_top_left, panel_bottom_right, cv::Scalar(0, 0, 0), -1);
+        cv::rectangle(image, panel_top_left, panel_bottom_right, cv::Scalar(0, 255, 255),
+                     std::max(1, text_thickness/2));
+
+        // 缁樺埗鏂囧瓧
+        cv::putText(image, id_info,
+                   cv::Point(panel_top_left.x + 5, panel_top_left.y + static_cast<int>(15 * font_scale)),
+                   cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(0, 255, 255), text_thickness);
+        cv::putText(image, color_info,
+                   cv::Point(panel_top_left.x + 5, panel_top_left.y + static_cast<int>(30 * font_scale)),
+                   cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(0, 255, 255), text_thickness);
+        cv::putText(image, coord_info,
+                   cv::Point(panel_top_left.x + 5, panel_top_left.y + static_cast<int>(45 * font_scale)),
+                   cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(0, 255, 255), text_thickness);
+        cv::putText(image, conf_info,
+                   cv::Point(panel_top_left.x + 5, panel_top_left.y + static_cast<int>(60 * font_scale)),
+                   cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(0, 255, 255), text_thickness);
+
+        // 杈撳嚭鍒版帶鍒跺彴
+        std::cout << "瑁呯敳鏉縖" << (i+1) << "] 棰滆壊: " << armor.color
+                  << ", 鍧愭爣: (" << armor.center.x << ", " << armor.center.y << ")"
+                  << ", 缃俊搴? " << armor.confidence << std::endl;
+    }
+
+    // 鏄剧ず鍏ㄥ眬淇℃伅
+    double global_font_scale = std::max(0.5, std::min(image.cols, image.rows) / 1200.0);
+    int global_thickness = std::max(1, static_cast<int>(global_font_scale * 2));
+
+    std::string status_info = "Press 'q' to quit | 's' toggle UI | 'b' toggle binary";
+    cv::putText(image, status_info,
+               cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, global_font_scale, cv::Scalar(0, 255, 255), global_thickness);
+
+    if (!show_ui) {
+        cv::putText(image, "UI HIDDEN",
+                   cv::Point(10, 60), cv::FONT_HERSHEY_SIMPLEX, global_font_scale, cv::Scalar(0, 0, 255), global_thickness);
+    }
+
+    // 鏄剧ず鎵惧埌鐨勮鐢叉澘鏁伴噺
+    std::string count_info = "Targets: " + std::to_string(armors.size());
+    cv::putText(image, count_info,
+               cv::Point(10, image.rows - 10), cv::FONT_HERSHEY_SIMPLEX, global_font_scale, cv::Scalar(0, 255, 0), global_thickness);
+
+    // 鏄剧ず褰撳墠鏃堕棿
+    time_t now = time(0);
+    struct tm tstruct;
+    char time_buf[80];
+    localtime_s(&tstruct, &now);
+    strftime(time_buf, sizeof(time_buf), "%X", &tstruct);
+    std::string time_str = "Time: ";
+    time_str += time_buf;
+    cv::putText(image, time_str,
+               cv::Point(image.cols - 150, 30), cv::FONT_HERSHEY_SIMPLEX, global_font_scale, cv::Scalar(255, 255, 255), global_thickness/2 + 1);
+
+    // 鏄剧ずFPS淇℃伅锛堜慨澶嶈绠楅€昏緫锛?
+    static int frame_count = 0;
+    static time_t last_time = time(0);
+    static double fps = 0.0;
+    frame_count++;
+
+    time_t current_time = time(0);
+    if (difftime(current_time, last_time) >= 1.0) {
+        fps = static_cast<double>(frame_count) / difftime(current_time, last_time);
+        frame_count = 0;
+        last_time = current_time;
+    }
+
+    std::string fps_info = "FPS: " + std::to_string(static_cast<int>(fps));
+    cv::putText(image, fps_info,
+               cv::Point(image.cols - 150, 60), cv::FONT_HERSHEY_SIMPLEX, global_font_scale, cv::Scalar(255, 255, 0), global_thickness/2 + 1);
+
+    // 缁樺埗娓告垙淇℃伅
+    drawGameInfo(image);
+}
+
+void ArmorDetector::drawGameInfo(cv::Mat& image) {
+    // 鏍规嵁鍒嗚鲸鐜囪皟鏁村瓧浣撳ぇ灏?
+    double font_scale = std::max(0.4, std::min(image.cols, image.rows) / 1000.0);
+    int thickness = std::max(1, static_cast<int>(font_scale * 2));
+
+    // 缁樺埗鍥炲悎淇℃伅
+    std::string round_info = "Round: " + std::to_string(round_count);
+    cv::putText(image, round_info,
+               cv::Point(image.cols - 150, 90), cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(0, 255, 255), thickness);
+
+    // 缁樺埗璇嗗埆娆℃暟淇℃伅
+    std::string recog_info = "Recognitions: " + std::to_string(recognition_count) + "/2";
+    cv::putText(image, recog_info,
+               cv::Point(image.cols - 150, 90 + static_cast<int>(20 * font_scale)),
+               cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(0, 255, 255), thickness);
+
+    // 缁樺埗璇嗗埆妯″紡淇℃伅
+    std::string mode_info;
+    switch (recognition_mode) {
+        case 0:
+            mode_info = "Mode: Preparation";
+            break;
+        case 1:
+            mode_info = "Mode: 1st Recognition";
+            break;
+        case 2:
+            mode_info = "Mode: 2nd Recognition";
+            break;
+        default:
+            mode_info = "Mode: Unknown";
+    }
+    cv::putText(image, mode_info,
+               cv::Point(image.cols - 150, 90 + static_cast<int>(40 * font_scale)),
+               cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(0, 255, 255), thickness);
+
+    // 缁樺埗鏄惁鍏佽璇嗗埆鐨勪俊鎭?
+    std::string allow_info = is_recognition_allowed ? "Status: Allowed" : "Status: Not Allowed";
+    cv::putText(image, allow_info,
+               cv::Point(image.cols - 150, 90 + static_cast<int>(60 * font_scale)),
+               cv::FONT_HERSHEY_SIMPLEX, font_scale,
+               is_recognition_allowed ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), thickness);
+}
+
+void ArmorDetector::startNewRound() {
+    round_count++;
+    recognition_count = 0;
+    is_recognition_allowed = false;
+    std::cout << "寮€濮嬬 " << round_count << " 鍥炲悎" << std::endl;
+}
+
+void ArmorDetector::allowRecognition() {
+    if (recognition_count < 2) {
+        is_recognition_allowed = true;
+        recognition_count++;
+        std::cout << "鍏佽绗?" << recognition_count << " 娆¤瘑鍒? << std::endl;
+    } else {
+        std::cout << "鏈洖鍚堣瘑鍒鏁板凡鐢ㄥ畬" << std::endl;
+    }
+}
+
+void ArmorDetector::finishRecognition() {
+    is_recognition_allowed = false;
+    std::cout << "璇嗗埆瀹屾垚锛岀瓑寰呬笅娆℃巿鏉? << std::endl;
+}
+
+void ArmorDetector::setBrightCondition() {
+    int preset_bright_slider = cv::getTrackbarPos("Preset Bright", "鍙傛暟璋冭妭");
+    exposure_time = preset_bright_slider * 100;
+    exposure_time = std::max(MIN_EXPOSURE_TIME, std::min(exposure_time, MAX_EXPOSURE_TIME));
+    cv::setTrackbarPos("MVExpTime", "鍙傛暟璋冭妭", exposure_time / 100);
+    std::cout << "璁剧疆涓烘槑浜幆澧冨揩闂ㄩ€熷害: " << exposure_time << " 寰" << std::endl;
+}
+
+void ArmorDetector::setNormalCondition() {
+    int preset_normal_slider = cv::getTrackbarPos("Preset Normal", "鍙傛暟璋冭妭");
+    exposure_time = preset_normal_slider * 100;
+    exposure_time = std::max(MIN_EXPOSURE_TIME, std::min(exposure_time, MAX_EXPOSURE_TIME));
+    cv::setTrackbarPos("MVExpTime", "鍙傛暟璋冭妭", exposure_time / 100);
+    std::cout << "璁剧疆涓烘甯哥幆澧冨揩闂ㄩ€熷害: " << exposure_time << " 寰" << std::endl;
+}
+
+void ArmorDetector::setDarkCondition() {
+    int preset_dark_slider = cv::getTrackbarPos("Preset Dark", "鍙傛暟璋冭妭");
+    exposure_time = preset_dark_slider * 100;
+    exposure_time = std::max(MIN_EXPOSURE_TIME, std::min(exposure_time, MAX_EXPOSURE_TIME));
+    cv::setTrackbarPos("MVExpTime", "鍙傛暟璋冭妭", exposure_time / 100);
+    std::cout << "璁剧疆涓洪粦鏆楃幆澧冨揩闂ㄩ€熷害: " << exposure_time << " 寰" << std::endl;
+}
+
+void ArmorDetector::savePresetParams() {
+    // 浠庢粦鍔ㄦ潯鑾峰彇褰撳墠棰勮鍊?
+    int exposure_slider = cv::getTrackbarPos("MVExpTime", "鍙傛暟璋冭妭");
+    int current_exposure = exposure_slider * 100;
+
+    // 淇濆瓨褰撳墠鍙傛暟涓洪璁惧€?
+    preset_exposure_bright = std::max(MIN_EXPOSURE_TIME, std::min(current_exposure / 2, MAX_EXPOSURE_TIME));
+    preset_exposure_normal = std::max(MIN_EXPOSURE_TIME, std::min(current_exposure, MAX_EXPOSURE_TIME));
+    preset_exposure_dark = std::max(MIN_EXPOSURE_TIME, std::min(current_exposure * 2, MAX_EXPOSURE_TIME));
+
+    // 鏇存柊棰勮婊戝姩鏉?
+    cv::setTrackbarPos("Preset Bright", "鍙傛暟璋冭妭", preset_exposure_bright / 100);
+    cv::setTrackbarPos("Preset Normal", "鍙傛暟璋冭妭", preset_exposure_normal / 100);
+    cv::setTrackbarPos("Preset Dark", "鍙傛暟璋冭妭", preset_exposure_dark / 100);
+
+    std::cout << "淇濆瓨棰勮鍙傛暟瀹屾垚:" << std::endl;
+    std::cout << "  鏄庝寒鐜: " << preset_exposure_bright << " 寰" << std::endl;
+    std::cout << "  姝ｅ父鐜: " << preset_exposure_normal << " 寰" << std::endl;
+    std::cout << "  榛戞殫鐜: " << preset_exposure_dark << " 寰" << std::endl;
+}
+
+void ArmorDetector::loadPresetParams(int preset_type) {
+    int target_exposure = exposure_time;
+    switch(preset_type) {
+        case 0: // 鏄庝寒鐜
+            target_exposure = preset_exposure_bright;
+            break;
+        case 1: // 姝ｅ父鐜
+            target_exposure = preset_exposure_normal;
+            break;
+        case 2: // 榛戞殫鐜
+            target_exposure = preset_exposure_dark;
+            break;
+        default:
+            break;
+    }
+
+    // 纭繚鏇濆厜鏃堕棿鍦ㄦ湁鏁堣寖鍥村唴
+    target_exposure = std::max(MIN_EXPOSURE_TIME, std::min(target_exposure, MAX_EXPOSURE_TIME));
+    exposure_time = target_exposure;
+
+    // 鏇存柊婊戝姩鏉′綅缃?
+    cv::setTrackbarPos("MVExpTime", "鍙傛暟璋冭妭", exposure_time / 100);
+
+    std::cout << "鍔犺浇棰勮鍙傛暟瀹屾垚锛屽綋鍓嶆洕鍏夋椂闂? " << exposure_time << " 寰" << std::endl;
+}
+
+void ArmorDetector::run() {
+    if (!is_camera_opened) {
+        std::cerr << "鎽勫儚澶存湭姝ｇ‘鍒濆鍖栵紝鏃犳硶杩愯绋嬪簭" << std::endl;
+        return;
+    }
+
+    std::cout << "瑁呯敳鏉胯瘑鍒▼搴忓惎鍔?.." << std::endl;
+    std::cout << "鎸夐敭璇存槑:" << std::endl;
+    std::cout << "  q: 閫€鍑虹▼搴? << std::endl;
+    std::cout << "  s: 鍒囨崲UI鏄剧ず" << std::endl;
+    std::cout << "  b: 鍒囨崲浜屽€煎寲鍥惧儚鏄剧ず" << std::endl;
+    std::cout << "  r: 寮€濮嬫柊鍥炲悎" << std::endl;
+    std::cout << "  a: 鍏佽璇嗗埆" << std::endl;
+    std::cout << "  f: 瀹屾垚璇嗗埆" << std::endl;
+    std::cout << "  1: 鏄庝寒鐜蹇棬閫熷害" << std::endl;
+    std::cout << "  2: 姝ｅ父鐜蹇棬閫熷害" << std::endl;
+    std::cout << "  3: 榛戞殫鐜蹇棬閫熷害" << std::endl;
+    std::cout << "  p: 淇濆瓨褰撳墠鍙傛暟涓洪璁? << std::endl;
+    std::cout << "========================" << std::endl;
+
+    createTrackbars();
+
+    while (true) {
+        // 鏇存柊棰滆壊鑼冨洿鍜岀浉鏈哄弬鏁帮紙浠庢粦鍔ㄦ潯鑾峰彇锛?
+        updateColorRanges();
+        updateCameraParams();
+
+        // 璇诲彇甯?
+        cap >> frame;
+        if (frame.empty()) {
+            std::cerr << "鏃犳硶鑾峰彇鎽勫儚澶寸敾闈?" << std::endl;
+            break;
+        }
+
+        // 鍥惧儚棰勫鐞?
+        cv::Mat processed = preprocess(frame);
+
+        // 濡傛灉鍏佽璇嗗埆锛屽垯杩涜瑁呯敳鏉挎娴?
+        std::vector<ArmorInfo> armors;
+        if (is_recognition_allowed || recognition_mode == 0) {
+            // 鍒嗗埆鏌ユ壘绾㈣摑瑁呯敳鏉跨殑鐏潯
+            auto red_contours = findContoursByColor(processed, "red");
+            auto blue_contours = findContoursByColor(processed, "blue");
+
+            // 鍖归厤瑁呯敳鏉?
+            armors = matchArmors(red_contours, blue_contours);
+        }
+
+        // 缁樺埗UI
+        if (show_ui) {
+            drawUI(frame, armors);
+        }
+
+        // 鏄剧ず缁撴灉
+        cv::imshow("瑁呯敳鏉胯瘑鍒?, frame);
+
+        // 鏄剧ず浜屽€煎寲鍥惧儚
+        if (show_binary) {
+            drawBinaryImages(processed);
+        }
+
+        // 閿洏杈撳叆澶勭悊
+        char key = cv::waitKey(1);
+        if (key == 'q' || key == 'Q') {
+            break;
+        } else if (key == 's' || key == 'S') {
+            show_ui = !show_ui;
+        } else if (key == 'b' || key == 'B') {
+            show_binary = !show_binary;
+            if (!show_binary) {
+                cv::destroyWindow("浜屽€煎寲鍥惧儚");
+            }
+        } else if (key == 'r' || key == 'R') {
+            startNewRound();
+        } else if (key == 'a' || key == 'A') {
+            allowRecognition();
+        } else if (key == 'f' || key == 'F') {
+            finishRecognition();
+        } else if (key == '1') {
+            setBrightCondition();
+        } else if (key == '2') {
+            setNormalCondition();
+        } else if (key == '3') {
+            setDarkCondition();
+        } else if (key == 'p' || key == 'P') {
+            savePresetParams();
+        }
+    }
+}
+PS D:\armor_detector> 

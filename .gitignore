@@ -1,0 +1,36 @@
+# Build artifacts
+build/
+build_dir/
+Release/
+x64/
+armor_detector.dir/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.vcxproj*
+*.sln
+*.vcxproj.filters
+.vs/
+ALL_BUILD.vcxproj*
+ZERO_CHECK.vcxproj*
+
+# IDE
+.vscode/
+
+# Temp
+*.zip
+*.7z
+gcc-libs-extract/
+winlibs-*/
+
+# Output
+*.mp4
+*.png
+*.jpg
+preset_*.yaml
+video_*.mp4
+shot_*.png
+
+# OS
+Thumbs.db
+Desktop.ini
