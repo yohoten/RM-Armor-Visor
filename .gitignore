@@ -34,3 +34,6 @@ shot_*.png
 # OS
 Thumbs.db
 Desktop.ini
+
+# ignore dosc folder
+# dosc/

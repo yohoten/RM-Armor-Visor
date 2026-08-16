@@ -38,9 +38,7 @@
 # RoboMaster装甲板识别系统
 
 本项目是一个基于C++和OpenCV4开发的RoboMaster比赛用装甲板识别系统，用于机器人视觉自动瞄准，提升对抗中的精准打击能力。系统利用装甲板灯条发光的特性，通过低曝光设置屏蔽环境光干扰，采用二值化处理获取灯条图像，并基于灯条的几何特征进行筛选和匹配，最终实现装甲板的精确识别。
-
-![image-20251123215136802](C:\Users\yohoten\AppData\Roaming\Typora\typora-user-images\image-20251123215136802.png)
-
+![](https://i.imgs.ovh/2026/08/16/930a4956f18fbab653a036857bcc4756.jpg)
 ## 功能特性
 
 1. **实时装甲板识别**：支持红色和蓝色双色装甲板的实时识别
@@ -382,11 +380,9 @@ vector<Point2f> pairLightBars(const vector<RotatedRect>& light_bars) {
    - 参数将保存到params.xml文件中
    - 下次启动时会自动加载保存的参数
 
-## ![image-20251123214335636](C:\Users\yohoten\AppData\Roaming\Typora\typora-user-images\image-20251123214335636.png![image-20251123214747333](C:\Users\yohoten\AppData\Roaming\Typora\typora-user-images\image-20251123214747333.png)
-
 创建build目录并运行CMake配置：mkdir build && cd build && cmake .. -DOpenCV_DIR="C:/opencv/build/x64/vc15/lib"
 
-![image-20251123221126260](C:\Users\yohoten\AppData\Roaming\Typora\typora-user-images\image-20251123221126260.png)
+![](https://i.imgs.ovh/2026/08/16/f246ac689998bd861f9eca7f984d35bd.jpg)
 
 在Windows环境下分步执行CMake配置命令：
 
@@ -400,4 +396,4 @@ cmake .. -DOpenCV_DIR="C:/opencv/build/x64/vc15/lib"（运行CMake配置命令�
 
 使用CMake构建项目:cmake --build . --config Release
 
-![image-20251123221248484](C:\Users\yohoten\AppData\Roaming\Typora\typora-user-images\image-20251123221248484.png)
+![](https://i.imgs.ovh/2026/08/16/bf61e39679d01f04d7e8abbb78dd839a.jpg)
