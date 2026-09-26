@@ -36,6 +36,7 @@ body::before{
   background-image:linear-gradient(rgba(0,229,192,.035) 1px,transparent 1px),
                    linear-gradient(90deg,rgba(0,229,192,.035) 1px,transparent 1px);
   background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 10%,transparent 78%);
   mask-image:radial-gradient(ellipse at 50% 0%,#000 10%,transparent 78%);
 }
 body::after{
@@ -52,7 +53,7 @@ code{font-family:var(--mono);font-size:.88em}
 
 /* ── 导航 ── */
 header.nav{
-  position:sticky;top:0;z-index:900;backdrop-filter:blur(14px);
+  position:sticky;top:0;z-index:900;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
   background:linear-gradient(180deg,rgba(5,7,11,.92),rgba(5,7,11,.55));
   border-bottom:1px solid var(--line-soft);
 }
@@ -106,8 +107,28 @@ h1.title span{color:var(--cyan);text-shadow:0 0 34px rgba(0,229,192,.45)}
   display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line-soft);
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--txt-dim);background:rgba(255,255,255,.02)
 }
-.visor-bar .lamp{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.6s infinite}
+/* 运行指示灯：青色（红色在本页已专属 REC / SAFE），与画面运行状态联动 */
+.visor-bar .lamp{width:7px;height:7px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);animation:pulse 1.6s infinite;
+  transition:background .25s,box-shadow .25s}
 .visor-bar .fps{margin-left:auto;color:var(--cyan)}
+
+/* 标签扫描光效：一道青色高光循环扫过文字 */
+.visor-bar .feed{position:relative}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .visor-bar .feed{
+    background:linear-gradient(100deg,var(--txt-dim) 0 40%,var(--cyan) 50%,var(--txt-dim) 60% 100%);
+    background-size:220% 100%;background-position:50% 0;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    animation:sweep 3.2s linear infinite;
+  }
+}
+@keyframes sweep{from{background-position:180% 0}to{background-position:-80% 0}}
+
+/* 画面离屏暂停：灯转灰常亮，文字停止扫描 */
+.visor.off .lamp{background:#5d6b7d;box-shadow:none;animation:none;opacity:.8}
+.visor.off .feed{animation:none}
 canvas{display:block;width:100%;height:auto}
 .visor-cap{padding:10px 14px;border-top:1px solid var(--line-soft);font-family:var(--mono);
   font-size:11px;color:#5d6b7d;letter-spacing:.04em}
@@ -214,7 +235,11 @@ footer a{color:var(--txt-dim)}
   .row-b .fps{grid-column:2;text-align:left}
   .nav nav{display:none}
 }
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rise{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+  .rise{opacity:1;transform:none}
+}
 </style>
 </head>
 <body>
@@ -255,7 +280,7 @@ footer a{color:var(--txt-dim)}
   <!-- 视窗演示 -->
   <div class="visor">
     <div class="visor-bar">
-      <span class="lamp"></span><span>ARMOR DETECTION — LIVE FEED</span>
+      <span class="lamp"></span><span class="feed">ARMOR DETECTION — LIVE FEED</span>
       <span class="fps" id="fpsOut">FPS 60</span>
     </div>
     <canvas id="visor" width="1280" height="720" aria-label="装甲板识别界面演示动画"></canvas>
@@ -574,12 +599,17 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
 }));
 
 /* ── 复制按钮 ── */
-document.querySelectorAll('.copy').forEach(b => b.addEventListener('click', async () => {
-  const code = b.closest('.code').querySelector('pre').innerText;
-  try { await navigator.clipboard.writeText(code); } catch (_) {}
-  const old = b.textContent; b.textContent = '已复制 ✓'; b.style.color = 'var(--cyan)';
-  setTimeout(() => { b.textContent = old; b.style.color = ''; }, 1400);
-}));
+document.querySelectorAll('.copy').forEach(b => {
+  const label = b.textContent;   // 原始文案在闭包外固定，避免连点时被「已复制 ✓」覆盖
+  let timer = 0;
+  b.addEventListener('click', async () => {
+    const code = b.closest('.code').querySelector('pre').innerText;
+    try { await navigator.clipboard.writeText(code); } catch (_) {}
+    clearTimeout(timer);
+    b.textContent = '已复制 ✓'; b.style.color = 'var(--cyan)';
+    timer = setTimeout(() => { b.textContent = label; b.style.color = ''; }, 1400);
+  });
+});
 
 /* ── 性能条动画 ── */
 const bo = new IntersectionObserver(es => es.forEach(e => {
@@ -599,9 +629,51 @@ document.querySelectorAll('.bench').forEach(el => bo.observe(el));
   const fpsOut = document.getElementById('fpsOut');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const drawings = [];
   const RED = '#ff3b52', BLUE = '#3d8cff', CYAN = '#00e5c0';
-  let t = 0, lastFpsPaint = 0;
+  const KEYS = ['^Q:QUIT', 'S:UI', 'B:BIN', 'R:NEW', 'A:ARM', 'F:FIN', '1-3:EXP', 'V:REC', 'SPC:SHT'];
+
+  let t = 0, prev = 0, raf = 0, running = false;
+  let fpsMark = 0, clockMs = 0, clockTxt = '';
+
+  /* ── 静态层：底色+网格 / 暗角+扫描线，各烘焙一次，逐帧只 drawImage ── */
+  function bake(paint) {
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    paint(c.getContext('2d'));
+    return c;
+  }
+  const bgLayer = bake(g => {
+    g.fillStyle = '#070a10'; g.fillRect(0, 0, W, H);
+    g.strokeStyle = 'rgba(120,160,180,.055)'; g.lineWidth = 1;
+    for (let x = 0; x < W; x += 64) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+    for (let y = 0; y < H; y += 64) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+  });
+  const fxLayer = bake(g => {
+    const vig = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .95);
+    vig.addColorStop(0, 'rgba(0,0,0,0)'); vig.addColorStop(1, 'rgba(0,0,0,.62)');
+    g.fillStyle = vig; g.fillRect(0, 0, W, H);
+    g.fillStyle = 'rgba(0,0,0,.14)';
+    for (let y = 0; y < H; y += 3) g.fillRect(0, y, W, 1);
+  });
+  const topGrad = (() => {
+    const g = ctx.createLinearGradient(0, 0, 0, 40);
+    g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,.05)');
+    return g;
+  })();
+
+  /* 灯条辉光贴图：替代逐帧 shadowBlur（canvas 上最昂贵的绘制操作之一） */
+  const GLOW_PAD = 26;
+  function bloomSprite(color) {
+    const c = document.createElement('canvas'); c.width = c.height = 96;
+    const g = c.getContext('2d');
+    const rg = g.createRadialGradient(48, 48, 3, 48, 48, 48);
+    rg.addColorStop(0, color);
+    rg.addColorStop(.4, color + '70');
+    rg.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, 96, 96);
+    return c;
+  }
+  const BLOOM = { red: bloomSprite(RED), blue: bloomSprite(BLUE) };
 
   function glowText(txt, x, y, color, size, align) {
     ctx.font = '600 ' + size + 'px ui-monospace, Menlo, Consolas, monospace';
@@ -614,6 +686,7 @@ document.querySelectorAll('.bench').forEach(el => bo.observe(el));
   }
 
   function brackets(r, color, len) {
+    ctx.save();   // lineCap 改动不外泄到后续细线
     ctx.strokeStyle = color; ctx.lineWidth = 2.4; ctx.lineCap = 'square';
     const { x, y, w, h } = r;
     const segs = [
@@ -623,6 +696,7 @@ document.querySelectorAll('.bench').forEach(el => bo.observe(el));
       [x + w, y + h, x + w - len, y + h], [x + w, y + h, x + w, y + h - len]
     ];
     segs.forEach(s => { ctx.beginPath(); ctx.moveTo(s[0], s[1]); ctx.lineTo(s[2], s[3]); ctx.stroke(); });
+    ctx.restore();
   }
 
   function infoCard(armor, color, cp) {
@@ -667,17 +741,19 @@ document.querySelectorAll('.bench').forEach(el => bo.observe(el));
   }
 
   function topBar(count, armed) {
-    const g = ctx.createLinearGradient(0, 0, 0, 40);
-    g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,.05)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, 40);
+    ctx.fillStyle = topGrad; ctx.fillRect(0, 0, W, 40);
     ctx.strokeStyle = 'rgba(0,200,180,.7)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(0, 39.5); ctx.lineTo(W, 39.5); ctx.stroke();
     glowText('TGT ' + count, 18, 27, count ? '#00ffc8' : '#78848f', 20);
     glowText('R1', 132, 27, '#00ff64', 20);
     glowText(armed ? 'ARMED' : 'SAFE', 236, 27, armed ? '#00ff50' : '#ff503c', 20);
-    const d = new Date();
-    const clock = [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
-    glowText(clock, W - 20, 27, '#c8d2dc', 19, 'right');
+    const now = Date.now();
+    if (now - clockMs >= 1000) {          // 时钟只到秒，无需每帧 new Date()
+      clockMs = now;
+      const d = new Date();
+      clockTxt = [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
+    }
+    glowText(clockTxt, W - 20, 27, '#c8d2dc', 19, 'right');
   }
 
   function bottomBar() {
@@ -685,10 +761,9 @@ document.querySelectorAll('.bench').forEach(el => bo.observe(el));
     ctx.fillStyle = 'rgba(10,12,16,.92)'; ctx.fillRect(0, y, W, bh);
     ctx.strokeStyle = 'rgba(0,180,160,.6)'; ctx.beginPath();
     ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke();
-    const keys = ['^Q:QUIT', 'S:UI', 'B:BIN', 'R:NEW', 'A:ARM', 'F:FIN', '1-3:EXP', 'V:REC', 'SPC:SHT'];
     ctx.font = '14px ui-monospace, Menlo, Consolas, monospace';
     ctx.fillStyle = 'rgba(175,185,196,.85)'; ctx.textAlign = 'left';
-    keys.forEach((k, i) => ctx.fillText(k, 22 + i * 138, H - 8));
+    KEYS.forEach((k, i) => ctx.fillText(k, 22 + i * 138, H - 8));
   }
 
   function makeTarget(base, spread, amp, phase, color, name, yBase) {
@@ -706,14 +781,13 @@ document.querySelectorAll('.bench').forEach(el => bo.observe(el));
     };
   }
 
-  function frame() {
-    t = reduce ? 1 : t + 1;
-    ctx.fillStyle = '#070a10'; ctx.fillRect(0, 0, W, H);
+  function frame(now) {
+    if (!prev) prev = now;
+    const dt = Math.min(now - prev, 50);   // 掉帧时钳位，避免长时间挂起后跳变
+    prev = now;
+    t += reduce ? 0 : dt / 16.6667;        // 归一化到 60fps 基准，与刷新率解耦
 
-    // 网格
-    ctx.strokeStyle = 'rgba(120,160,180,.055)'; ctx.lineWidth = 1;
-    for (let x = 0; x < W; x += 64) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-    for (let y = 0; y < H; y += 64) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    ctx.drawImage(bgLayer, 0, 0);          // 底色 + 网格（原每帧 33 次绘制）
 
     const targets = [
       makeTarget(720, 150, 190, .012, RED, 'red', 300),
@@ -721,11 +795,13 @@ document.querySelectorAll('.bench').forEach(el => bo.observe(el));
     ];
 
     targets.forEach(tg => {
-      // 灯条
-      ctx.shadowColor = tg.color; ctx.shadowBlur = 26;
+      // 灯条：辉光贴图 + 实心矩形，替代 shadowBlur
+      tg.bars.forEach(b => ctx.drawImage(
+        BLOOM[tg.name],
+        b.x - GLOW_PAD, b.y - GLOW_PAD, b.w + GLOW_PAD * 2, b.h + GLOW_PAD * 2
+      ));
       ctx.fillStyle = tg.color;
       tg.bars.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
-      ctx.shadowBlur = 0;
 
       const box = {
         x: tg.bars[0].x - 12, y: tg.bars[0].y - 12,
@@ -758,24 +834,40 @@ document.querySelectorAll('.bench').forEach(el => bo.observe(el));
 
     crosshair();
 
-    // 暗角 + 扫描线
-    const vig = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .95);
-    vig.addColorStop(0, 'rgba(0,0,0,0)'); vig.addColorStop(1, 'rgba(0,0,0,.62)');
-    ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = 'rgba(0,0,0,.14)';
-    for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
+    ctx.drawImage(fxLayer, 0, 0);         // 暗角 + 扫描线（原每帧 241 次 fillRect）
 
     topBar(targets.length, true);
     bottomBar();
 
-    if (!reduce && t - lastFpsPaint > 24) {
-      lastFpsPaint = t;
+    if (!reduce && t - fpsMark > 24) {
+      fpsMark = t;
       const f = 60 + Math.round(Math.sin(t * .05) * 3);
       fpsOut.textContent = 'FPS ' + f + '  ·  TGT ' + targets.length;
     }
-    requestAnimationFrame(frame);
+    if (running) raf = requestAnimationFrame(frame);
   }
-  frame();
+
+  /* ── 驱动：离屏即停；reduce 时只画一帧静止画面 ── */
+  function start() {
+    if (running) return;
+    running = true; prev = 0;
+    raf = requestAnimationFrame(frame);
+  }
+  function stop() {
+    running = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+  }
+  const box = cv.closest('.visor');
+  if (reduce) {
+    requestAnimationFrame(n => { prev = n; frame(n); });
+  } else {
+    new IntersectionObserver(es => {
+      const on = es[0].isIntersecting;
+      on ? start() : stop();
+      if (box) box.classList.toggle('off', !on);   // 顶栏指示灯与扫描光效跟随画面状态
+    }, { threshold: 0 }).observe(cv);
+  }
 })();
 </script>
 </body>
