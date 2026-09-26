@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RM-Armor-Visor · RoboMaster 装甲板识别系统</title>
+<meta name="description" content="基于 C++ 与 OpenCV4 的 RoboMaster 装甲板视觉识别系统，支持红/蓝双色实时检测、ROI 跟踪、自适应帧率优化与自定义 HUD。">
+<style>
+:root{
+  --bg:#05070b;
+  --bg-2:#080c13;
+  --panel:rgba(14,20,28,.72);
+  --line:rgba(0,229,192,.16);
+  --line-soft:rgba(140,170,190,.12);
+  --cyan:#00e5c0;
+  --cyan-dim:#0a8f7d;
+  --red:#ff3b52;
+  --blue:#3d8cff;
+  --amber:#ffb020;
+  --txt:#c6d2de;
+  --txt-dim:#7f8fa3;
+  --txt-hi:#eaf3f8;
+  --mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono","Courier New",ui-monospace,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+  font-size:15px;line-height:1.75;letter-spacing:.01em;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+/* 背景网格 + 扫描线 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(0,229,192,.035) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(0,229,192,.035) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse at 50% 0%,#000 10%,transparent 78%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.35;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,0) 0 2px,rgba(0,0,0,.35) 2px 3px);
+  mix-blend-mode:multiply;
+}
+.wrap{position:relative;z-index:1;width:min(1180px,92vw);margin:0 auto}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{color:var(--txt-hi);line-height:1.3;margin:0}
+code{font-family:var(--mono);font-size:.88em}
+::selection{background:rgba(0,229,192,.28);color:#fff}
+
+/* ── 导航 ── */
+header.nav{
+  position:sticky;top:0;z-index:900;backdrop-filter:blur(14px);
+  background:linear-gradient(180deg,rgba(5,7,11,.92),rgba(5,7,11,.55));
+  border-bottom:1px solid var(--line-soft);
+}
+.nav .wrap{display:flex;align-items:center;gap:22px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);color:var(--txt-hi);
+  font-size:14px;letter-spacing:.12em;font-weight:600;white-space:nowrap}
+.brand .dot{width:9px;height:9px;border-radius:2px;background:var(--cyan);
+  box-shadow:0 0 12px var(--cyan);animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.nav nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.nav nav a{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--txt-dim);
+  padding:7px 11px;border:1px solid transparent;border-radius:3px;transition:.18s;
+}
+.nav nav a:hover{color:var(--cyan);border-color:var(--line);background:rgba(0,229,192,.05);text-decoration:none}
+.gh{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--txt-hi)!important;
+  border:1px solid var(--line)!important;padding:7px 12px;border-radius:3px;white-space:nowrap;
+}
+.gh:hover{background:rgba(0,229,192,.1);text-decoration:none}
+
+/* ── Hero ── */
+.hero{padding:76px 0 30px}
+.tag{
+  display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;
+  letter-spacing:.2em;color:var(--cyan);border:1px solid var(--line);
+  padding:5px 12px;border-radius:2px;background:rgba(0,229,192,.06);
+}
+h1.title{
+  font-family:var(--mono);font-size:clamp(2.1rem,6vw,4rem);letter-spacing:-.02em;
+  margin:22px 0 0;font-weight:700;
+}
+h1.title span{color:var(--cyan);text-shadow:0 0 34px rgba(0,229,192,.45)}
+.subtitle{font-size:clamp(.95rem,2.2vw,1.18rem);color:var(--txt-dim);max-width:760px;margin:18px 0 0}
+.subtitle b{color:var(--txt);font-weight:600}
+.cta{display:flex;gap:12px;margin:30px 0 0;flex-wrap:wrap}
+.btn{
+  font-family:var(--mono);font-size:13px;letter-spacing:.05em;padding:11px 22px;border-radius:3px;
+  border:1px solid var(--line);color:var(--txt-hi);background:rgba(0,229,192,.07);transition:.18s;cursor:pointer;
+}
+.btn:hover{background:rgba(0,229,192,.16);border-color:var(--cyan);transform:translateY(-1px);text-decoration:none}
+.btn.ghost{background:transparent;border-color:var(--line-soft);color:var(--txt-dim)}
+.btn.ghost:hover{color:var(--txt-hi);border-color:var(--txt-dim);background:rgba(255,255,255,.03)}
+.meta-row{display:flex;gap:26px;flex-wrap:wrap;margin-top:28px;font-family:var(--mono);font-size:12px;color:var(--txt-dim)}
+.meta-row i{font-style:normal;color:var(--cyan)}
+
+/* ── 视窗 ── */
+.visor{margin:44px 0 0;position:relative;border:1px solid var(--line-soft);border-radius:4px;
+  background:#04060a;overflow:hidden;box-shadow:0 30px 80px -40px rgba(0,229,192,.35)}
+.visor-bar{
+  display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line-soft);
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--txt-dim);background:rgba(255,255,255,.02)
+}
+.visor-bar .lamp{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.6s infinite}
+.visor-bar .fps{margin-left:auto;color:var(--cyan)}
+canvas{display:block;width:100%;height:auto}
+.visor-cap{padding:10px 14px;border-top:1px solid var(--line-soft);font-family:var(--mono);
+  font-size:11px;color:#5d6b7d;letter-spacing:.04em}
+
+/* ── 区块 ── */
+section{padding:82px 0 0}
+.sec-head{margin-bottom:34px}
+.sec-no{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--cyan-dim)}
+.sec-head h2{font-size:clamp(1.5rem,3.4vw,2.05rem);margin:8px 0 0;letter-spacing:-.01em}
+.sec-head p{color:var(--txt-dim);margin:12px 0 0;max-width:720px}
+
+/* ── 卡片网格 ── */
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.card{
+  border:1px solid var(--line-soft);border-radius:4px;padding:20px 20px 22px;background:var(--panel);
+  position:relative;overflow:hidden;transition:.2s;
+}
+.card::before{content:"";position:absolute;left:0;top:0;width:2px;height:0;background:var(--cyan);transition:height .35s}
+.card:hover{border-color:var(--line);background:rgba(0,229,192,.035);transform:translateY(-2px)}
+.card:hover::before{height:100%}
+.card .ico{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--cyan-dim)}
+.card h3{font-size:15.5px;margin:10px 0 8px}
+.card p{margin:0;color:var(--txt-dim);font-size:13.6px;line-height:1.7}
+
+/* ── 管线 ── */
+.pipe{display:grid;grid-template-columns:repeat(7,1fr);gap:0;border:1px solid var(--line-soft);border-radius:4px;overflow:hidden}
+.step{padding:16px 12px;background:rgba(255,255,255,.015);border-right:1px solid var(--line-soft);
+  position:relative;transition:.2s;cursor:default}
+.step:last-child{border-right:none}
+.step:hover{background:rgba(0,229,192,.07)}
+.step .n{font-family:var(--mono);font-size:10.5px;color:var(--cyan-dim);letter-spacing:.1em}
+.step .t{font-size:13px;color:var(--txt-hi);margin:6px 0 5px;font-weight:600}
+.step .d{font-size:11.6px;color:var(--txt-dim);line-height:1.6;font-family:var(--mono)}
+
+/* ── 代码 ── */
+.code{border:1px solid var(--line-soft);border-radius:4px;background:#070a0f;overflow:hidden;margin-top:16px}
+.code .bar{display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid var(--line-soft);
+  font-family:var(--mono);font-size:11px;color:var(--txt-dim);background:rgba(255,255,255,.02)}
+.code .bar .f{margin-left:auto}
+.copy{margin-left:10px;border:1px solid var(--line-soft);background:transparent;color:var(--txt-dim);
+  font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:2px;cursor:pointer;transition:.15s}
+.copy:hover{color:var(--cyan);border-color:var(--line)}
+pre{margin:0;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.6px;line-height:1.72;color:#a8bccd}
+pre .c{color:#4f6478}.k{color:#7ec8ff}.s{color:#8ee6c0}.f{color:#ffd479}.n{color:#ff9db0}
+
+/* ── 标签页 ── */
+.tabs{display:flex;gap:6px;margin-top:22px;flex-wrap:wrap}
+.tab{font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:8px 16px;border:1px solid var(--line-soft);
+  border-radius:3px;color:var(--txt-dim);cursor:pointer;background:transparent;transition:.16s}
+.tab:hover{color:var(--txt-hi)}
+.tab.on{color:var(--cyan);border-color:var(--line);background:rgba(0,229,192,.09)}
+.pane{display:none}.pane.on{display:block}
+
+/* ── 表格 ── */
+.tbl{width:100%;border-collapse:collapse;font-size:13.4px;margin-top:18px}
+.tbl th,.tbl td{border:1px solid var(--line-soft);padding:10px 13px;text-align:left;vertical-align:top}
+.tbl th{background:rgba(0,229,192,.05);color:var(--txt-hi);font-weight:600;font-size:12.4px;
+  letter-spacing:.05em;font-family:var(--mono)}
+.tbl td{color:var(--txt-dim)}
+.tbl td kbd{font-family:var(--mono);font-size:11.5px;color:#0a0f14;background:var(--cyan);
+  padding:1.5px 7px;border-radius:2px;font-weight:700;display:inline-block;min-width:24px;text-align:center}
+.tbl tbody tr:hover td{background:rgba(255,255,255,.022);color:var(--txt)}
+.tbl td .v{color:var(--txt-hi);font-family:var(--mono);font-size:12.6px}
+
+/* ── 性能条 ── */
+.bench{display:grid;gap:12px;margin-top:18px}
+.row-b{display:grid;grid-template-columns:150px 1fr 118px;align-items:center;gap:14px}
+.row-b .lbl{font-size:13px;color:var(--txt)}
+.track{height:26px;background:rgba(255,255,255,.03);border:1px solid var(--line-soft);border-radius:2px;overflow:hidden;position:relative}
+.fill{height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.7,.2,1);display:flex;align-items:center;justify-content:flex-end;padding-right:9px;
+  font-family:var(--mono);font-size:11px;color:#05070b;font-weight:700}
+.row-b .fps{font-family:var(--mono);font-size:12px;color:var(--cyan);text-align:right}
+.f1{background:linear-gradient(90deg,rgba(0,229,192,.35),var(--cyan))}
+.f2{background:linear-gradient(90deg,rgba(61,140,255,.35),var(--blue))}
+.f3{background:linear-gradient(90deg,rgba(255,176,32,.35),var(--amber))}
+
+/* ── 文件树 ── */
+.tree{border:1px solid var(--line-soft);border-radius:4px;padding:18px 20px;background:#070a0f;
+  font-family:var(--mono);font-size:12.8px;line-height:1.95;overflow-x:auto}
+.tree .dir{color:var(--cyan)}
+.tree .file{color:#9db0c2}
+.tree .cmt{color:#4f6478}
+.tree .ind{color:#243244}
+
+/* ── 模块表 ── */
+.mod td:first-child{font-family:var(--mono);color:var(--cyan);font-size:12.5px;white-space:nowrap}
+
+footer{margin-top:96px;border-top:1px solid var(--line-soft);padding:34px 0 54px;position:relative;z-index:1}
+footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:11.6px;color:#5d6b7d;letter-spacing:.04em}
+footer a{color:var(--txt-dim)}
+
+/* ── 动效 ── */
+.rise{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.rise.in{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .g3,.g2{grid-template-columns:1fr}
+  .pipe{grid-template-columns:repeat(2,1fr)}
+  .step{border-bottom:1px solid var(--line-soft)}
+  .row-b{grid-template-columns:120px 1fr;gap:8px}
+  .row-b .fps{grid-column:2;text-align:left}
+  .nav nav{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rise{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>RM-ARMOR-VISOR</div>
+    <nav>
+      <a href="#features">特性</a>
+      <a href="#pipeline">处理流程</a>
+      <a href="#quickstart">快速开始</a>
+      <a href="#control">操作</a>
+      <a href="#perf">性能</a>
+      <a href="#structure">结构</a>
+    </nav>
+    <a class="gh" href="https://github.com/yohoten/RM-Armor-Visor" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</header>
+
+<div class="wrap hero">
+  <span class="tag">C++11 · OPENCV 4 · REALTIME TARGETING</span>
+  <h1 class="title">装甲板识别<br><span>Auto-Aiming</span> 视觉系统</h1>
+  <p class="subtitle">
+    面向 RoboMaster 对抗赛的机器视觉模块。利用装甲板灯条自发光特性，在<b>低曝光</b>下屏蔽环境光干扰，
+    经 HSV 阈值分割、形态学滤波、<b>灯条几何筛选</b>与<b>双灯条配对</b>，实时解算装甲板中心坐标并输出给下位机控制系统。
+  </p>
+  <div class="cta">
+    <a class="btn" href="#quickstart">开始构建 →</a>
+    <a class="btn ghost" href="https://github.com/yohoten/RM-Armor-Visor" target="_blank" rel="noopener">查看源码</a>
+  </div>
+  <div class="meta-row">
+    <span>版本 <i>v2.0</i></span>
+    <span>目标分辨率 <i>1280×720 @60fps</i></span>
+    <span>线程模型 <i>采集 / 处理 分离</i></span>
+    <span>GUI <i>OpenCV + 自绘 HUD</i></span>
+  </div>
+
+  <!-- 视窗演示 -->
+  <div class="visor">
+    <div class="visor-bar">
+      <span class="lamp"></span><span>ARMOR DETECTION — LIVE FEED</span>
+      <span class="fps" id="fpsOut">FPS 60</span>
+    </div>
+    <canvas id="visor" width="1280" height="720" aria-label="装甲板识别界面演示动画"></canvas>
+    <div class="visor-cap">↑ 界面演示（前端 Canvas 复刻 HUD 渲染效果，非真实采集画面）</div>
+  </div>
+</div>
+
+<!-- ═══ 特性 ═══ -->
+<div class="wrap">
+<section id="features" class="rise">
+  <div class="sec-head">
+    <div class="sec-no">01 / FEATURES</div>
+    <h2>功能特性</h2>
+    <p>从图像采集到坐标输出的全链路实现，并针对赛场实时性做了工程化取舍。</p>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="ico">◈ 01</div><h3>红 / 蓝双色实时识别</h3>
+      <p>红色因 HSV 色环跨 0° 与 180° 采用双区间合并掩膜，蓝色使用单区间，支持同帧多目标。</p></div>
+    <div class="card"><div class="ico">◈ 02</div><h3>中心坐标解算</h3>
+      <p>输出装甲板中心像素坐标、包围盒尺寸与相对画面中心的偏移量，直接供云台控制系统消费。</p></div>
+    <div class="card"><div class="ico">◈ 03</div><h3>自绘 HUD 可视化</h3>
+      <p>暗角、扫描线、八分刻度准星、角括号锁定框与信息卡实时叠加，并使用静态层缓存降低重绘开销。</p></div>
+    <div class="card"><div class="ico">◈ 04</div><h3>拖拽式参数面板</h3>
+      <p>自绘 380px 控制面板，分区管理曝光 / 增益 / HSV 阈值 / 形状过滤，支持分区折叠与鼠标拖拽调参。</p></div>
+    <div class="card"><div class="ico">◈ 05</div><h3>ROI 靶面跟踪</h3>
+      <p>以上帧最优目标为中心外扩 3×2 形成 ROI，仅在局部区域检索；连续 300 帧丢失即恢复全画面。</p></div>
+    <div class="card"><div class="ico">◈ 06</div><h3>自适应帧率策略</h3>
+      <p>按平滑 FPS 自动切换：<code>&lt;40</code> 启用简化流程并跳帧，<code>&lt;67</code> 隔帧处理，高帧率全量处理。</p></div>
+    <div class="card"><div class="ico">◈ 07</div><h3>相机曝光预设</h3>
+      <p>明亮 / 正常 / 黑暗三档快门预设，一键切换以适应不同场馆光照，配套 RGB 增益手动微调。</p></div>
+    <div class="card"><div class="ico">◈ 08</div><h3>YAML 参数持久化</h3>
+      <p>基于 <code>cv::FileStorage</code> 读写 <code>preset_*.yaml</code>，调试好的整套参数可存档并在启动时载入。</p></div>
+    <div class="card"><div class="ico">◈ 09</div><h3>录像与抓帧</h3>
+      <p>内建 MP4 录像（avc1）与 PNG 截图，带时间戳自动命名，便于赛后复盘与数据集采集。</p></div>
+    <div class="card"><div class="ico">◈ 10</div><h3>无相机降级运行</h3>
+      <p>摄像头缺失时进入 Demo 模式并每 2 秒尝试重连，界面与全部控件保持可用，便于离线调试。</p></div>
+  </div>
+</section>
+
+<!-- ═══ 流程 ═══ -->
+<section id="pipeline" class="rise">
+  <div class="sec-head">
+    <div class="sec-no">02 / PIPELINE</div>
+    <h2>处理流程</h2>
+    <p>采集线程负责取帧入队，处理线程独立执行繁重的图像运算，主线程专注渲染与交互。</p>
+  </div>
+  <div class="pipe">
+    <div class="step"><div class="n">STEP 01</div><div class="t">取帧</div><div class="d">VideoCapture<br>1280×720 / 60fps</div></div>
+    <div class="step"><div class="n">STEP 02</div><div class="t">预处理</div><div class="d">高斯模糊<br>BGR → HSV</div></div>
+    <div class="step"><div class="n">STEP 03</div><div class="t">颜色分割</div><div class="d">inRange 红蓝<br>掩膜相或</div></div>
+    <div class="step"><div class="n">STEP 04</div><div class="t">形态学</div><div class="d">OPEN 去噪<br>CLOSE 补洞</div></div>
+    <div class="step"><div class="n">STEP 05</div><div class="t">轮廓提取</div><div class="d">RETR_EXTERNAL<br>CHAIN_APPROX</div></div>
+    <div class="step"><div class="n">STEP 06</div><div class="t">灯条筛选</div><div class="d">面积 / 长宽比<br>凸性 + 颜色校验</div></div>
+    <div class="step"><div class="n">STEP 07</div><div class="t">配对打分</div><div class="d">几何约束<br>评分选最优</div></div>
+  </div>
+
+  <div class="code">
+    <div class="bar"><span>src/core/ImageProcessor.cpp</span><span class="f">56 行 · 灯条判定</span><button class="copy">复制</button></div>
+<pre><code><span class="c">// 灯条筛选 —— fitEllipse + 凸性(solidity)，参考 SEU 方案改进</span>
+<span class="k">bool</span> <span class="f">ImageProcessor::isLightBar</span>(<span class="k">const</span> std::vector&lt;cv::Point&gt;& contour) {
+    <span class="k">double</span> area = cv::<span class="f">contourArea</span>(contour);
+    <span class="k">if</span> (area &lt; filter.min_area || area &gt; filter.max_area) <span class="k">return</span> <span class="n">false</span>;
+
+    <span class="k">if</span> (contour.<span class="f">size</span>() &lt; <span class="n">5</span>) <span class="k">return</span> <span class="n">false</span>;              <span class="c">// fitEllipse 至少 5 点</span>
+    cv::RotatedRect rect = cv::<span class="f">fitEllipse</span>(contour);
+    <span class="f">adjustRect</span>(rect);                              <span class="c">// 归一化角度到 [-45,45]</span>
+
+    <span class="c">// solidity = 轮廓面积 / 椭圆面积，灯条应当足够充实</span>
+    <span class="k">double</span> ellipse_area = CV_PI * rect.size.width * rect.size.height / <span class="n">4.0</span>;
+    <span class="k">if</span> (ellipse_area &lt; <span class="n">1.0</span>) <span class="k">return</span> <span class="n">false</span>;
+    <span class="k">double</span> solidity = area / ellipse_area;
+    <span class="k">if</span> (solidity &lt; <span class="n">0.4</span> || solidity &gt; <span class="n">1.8</span>) <span class="k">return</span> <span class="n">false</span>;
+
+    <span class="k">float</span> hw_ratio = rect.size.height / std::<span class="f">max</span>(<span class="n">1.0f</span>, rect.size.width);
+    <span class="k">if</span> (hw_ratio &lt; filter.min_ratio || hw_ratio &gt; filter.max_ratio) <span class="k">return</span> <span class="n">false</span>;
+    <span class="k">return</span> <span class="n">true</span>;
+}</code></pre>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <div class="ico">▣ 配对约束</div>
+      <h3 style="margin-top:10px">装甲板几何判据</h3>
+      <ul style="margin:12px 0 0;padding-left:18px;color:var(--txt-dim);font-size:13.4px;line-height:2">
+        <li>角度差 <code>&lt; 7°</code>（简化模式放宽至 15°）</li>
+        <li>灯条高度差比 <code>&lt; 0.20</code></li>
+        <li>纵向错位 <code>yDiff / mean_h &lt; 2.0</code></li>
+        <li>横向间距比 <code>dist / mean_h ∈ [1.0, 5.0]</code></li>
+        <li>且 <code>xDiff &gt; yDiff</code>，横向排布优先</li>
+        <li>每个左灯条仅取首个有效配对（内置 NMS）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ico">▣ 评分函数</div>
+      <h3 style="margin-top:10px">最优目标决策</h3>
+      <p style="margin-top:12px">综合 <b style="color:var(--txt)">尺寸</b>、<b style="color:var(--txt)">居中程度</b> 与 <b style="color:var(--txt)">置信度</b> 三项加权，选出得分最高的目标移至队首，并据此更新跟踪 ROI。</p>
+      <div class="code" style="margin-top:14px">
+<pre style="padding:14px 16px"><code><span class="f">score</span> = <span class="f">exp</span>(area/<span class="n">1500</span>)
+       + <span class="f">exp</span>(-<span class="f">norm</span>(center-frame_center)/<span class="n">250</span>)
+       + confidence * <span class="n">3.0</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 快速开始 ═══ -->
+<section id="quickstart" class="rise">
+  <div class="sec-head">
+    <div class="sec-no">03 / BUILD</div>
+    <h2>快速开始</h2>
+    <p>依赖极少：一个支持 C++11 的编译器、CMake 3.10+ 与 OpenCV 4.x。以下两条命令即可产出可执行文件。</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-pane="win">Windows</button>
+    <button class="tab" data-pane="linux">Linux / Ubuntu</button>
+    <button class="tab" data-pane="docker">环境变量 & CLI</button>
+  </div>
+
+  <div class="pane on" id="win">
+    <div class="code">
+      <div class="bar"><span>PowerShell</span><span class="f">一键构建</span><button class="copy">复制</button></div>
+<pre><code><span class="c"># build.ps1 — 使用 MSYS2 MSVCRT GCC 构建（MinGW Makefiles）</span>
+<span class="s">$env:PATH</span> = <span class="s">"C:\msys64\mingw64\bin;$env:PATH"</span>
+cmake -G <span class="s">"MinGW Makefiles"</span> -DCMAKE_BUILD_TYPE=Release -B build -S .
+mingw32-make -C build -j4
+
+<span class="c"># run.ps1 — 未构建则自动构建后启动</span>
+.\run.ps1</code></pre>
+    </div>
+    <div class="code">
+      <div class="bar"><span>CMake GUI 路径</span><span class="f">OpenCV_DIR 必须显式指定</span><button class="copy">复制</button></div>
+<pre><code>mkdir build
+cmake .. -DOpenCV_DIR=<span class="s">"C:/opencv/build/x64/vc15/lib"</span>   <span class="c"># MSVC</span>
+cmake .. -DOpenCV_DIR=<span class="s">"H:/OpenCV-MinGW-Build-OpenCV-4.5.2-x64"</span>  <span class="c"># MinGW</span>
+cmake --build . --config Release</code></pre>
+    </div>
+    <p style="color:var(--txt-dim);font-size:13.4px">
+      注意：务必把 OpenCV 的 <code>bin</code> 目录加入 PATH，否则运行时会因缺少 DLL 而直接退出。
+      使用构建脚本时，CMake 已配置 POST_BUILD 自动拷贝 OpenCV 及 MinGW 运行时 DLL 到输出目录。
+    </p>
+  </div>
+
+  <div class="pane" id="linux">
+    <div class="code">
+      <div class="bar"><span>Bash</span><span class="f">apt 安装依赖</span><button class="copy">复制</button></div>
+<pre><code>sudo apt-get update
+sudo apt-get install build-essential cmake git libopencv-dev</code></pre>
+    </div>
+    <div class="code">
+      <div class="bar"><span>Bash</span><span class="f">构建 &amp; 运行</span><button class="copy">复制</button></div>
+<pre><code>mkdir -p build &amp;&amp; cd build
+cmake -DOpenCV_DIR=<span class="s">"path/to/opencv"</span> ..
+make -j$(nproc)
+
+./armor_detector          <span class="c"># 默认摄像头 0</span>
+./armor_detector 1        <span class="c"># 指定摄像头 1</span></code></pre>
+    </div>
+  </div>
+
+  <div class="pane" id="docker">
+    <div class="code">
+      <div class="bar"><span>命令行参数</span><span class="f">armor_detector --help</span><button class="copy">复制</button></div>
+<pre><code>armor_detector [-c CAM_ID] [-l preset.yaml] [--help]
+
+  -c &lt;id&gt;        指定摄像头索引，默认 0
+  -l &lt;file&gt;      启动时加载 YAML 参数预设
+  -h, --help     输出帮助信息</code></pre>
+    </div>
+    <div class="code">
+      <div class="bar"><span>要求</span><span class="f">Requirements</span></div>
+<pre><code>C++11 或更高
+OpenCV 4.0 或更高
+CMake 3.10 或更高
+支持 C++11 的编译器（GCC / Clang / MSVC / MinGW-w64）</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 操作 ═══ -->
+<section id="control" class="rise">
+  <div class="sec-head">
+    <div class="sec-no">04 / CONTROL</div>
+    <h2>操作与调参</h2>
+    <p>主窗口负责可视化与取键，Control Panel 窗口通过鼠标拖拽实时改写相机与算法参数。</p>
+  </div>
+
+  <h3 style="font-size:14px;letter-spacing:.1em;color:var(--cyan-dim);font-family:var(--mono)">键盘快捷键</h3>
+  <table class="tbl">
+    <thead><tr><th style="width:96px">按键</th><th style="width:200px">功能</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td><td><span class="v">退出程序</span></td><td>安全回收处理线程并释放摄像头与窗口资源。</td></tr>
+      <tr><td><kbd>S</kbd></td><td><span class="v">HUD 显示开关</span></td><td>隐藏全部叠加层，用于查看原始画面。</td></tr>
+      <tr><td><kbd>B</kbd></td><td><span class="v">二值化视图</span></td><td>叠加显示红 / 蓝掩膜，是调 HSV 阈值的主要依据。</td></tr>
+      <tr><td><kbd>R</kbd></td><td><span class="v">开始新回合</span></td><td>回合状态机 IDLE → R1 → R2 → DONE 归位。</td></tr>
+      <tr><td><kbd>A</kbd></td><td><span class="v">允许识别</span></td><td>解除保险，HUD 由 <span style="color:#ff503c">SAFE</span> 转为 <span style="color:#32ff50">ARMED</span>。</td></tr>
+      <tr><td><kbd>F</kbd></td><td><span class="v">完成识别</span></td><td>标记本回合识别任务结束。</td></tr>
+      <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td><span class="v">曝光预设</span></td><td>分别在明亮 / 正常 / 黑暗三档快门间切换（<code>5 / 30 / 100</code>）。</td></tr>
+      <tr><td><kbd>V</kbd></td><td><span class="v">录像开关</span></td><td>录制 avc1 编码 MP4，文件名带时间戳，HUD 显示 REC 红点。</td></tr>
+      <tr><td><kbd>Space</kbd></td><td><span class="v">截图</span></td><td>保存当前帧为 PNG。</td></tr>
+      <tr><td><kbd>P</kbd></td><td><span class="v">保存预设</span></td><td>将当前全部参数写入 <code>preset_*.yaml</code>。</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size:14px;letter-spacing:.1em;color:var(--cyan-dim);font-family:var(--mono);margin-top:38px">控制面板分区</h3>
+  <table class="tbl">
+    <thead><tr><th style="width:130px">分区</th><th style="width:230px">可调项</th><th>作用</th></tr></thead>
+    <tbody>
+      <tr><td><span class="v">CAMERA</span></td><td>Exposure · Gain</td><td>曝光量 0–2000、增益 0–100。低曝光是屏蔽环境光的第一步。</td></tr>
+      <tr><td><span class="v">RED ARMOR</span></td><td>H Width · S/V Min</td><td>红色阈值的色相跨度与饱和度 / 明度下限。</td></tr>
+      <tr><td><span class="v">BLUE ARMOR</span></td><td>H Center · H Width · S/V Min</td><td>蓝色阈值的中心色相、跨度与饱和度下限。</td></tr>
+      <tr><td><span class="v">FILTER</span></td><td>Min / Max Area · Max Angle</td><td>灯条面积窗口与配对最大允许角度差。</td></tr>
+      <tr><td><span class="v">ADVANCED</span></td><td>Min / Max Ratio · Min / Max Dist · Max H Diff</td><td>长宽比、双灯条间距与高度差约束，默认折叠。</td></tr>
+    </tbody>
+  </table>
+  <p style="color:var(--txt-dim);font-size:13.4px;margin-top:16px">
+    调参顺序建议：先用 <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> 与曝光滑条让画面欠曝但灯条清晰 → 按 <kbd>B</kbd> 观察二值化，收紧 HSV 使仅剩灯条 → 最后用 FILTER / ADVANCED 剔除误检。
+  </p>
+</section>
+
+<!-- ═══ 性能 ═══ -->
+<section id="perf" class="rise">
+  <div class="sec-head">
+    <div class="sec-no">05 / PERFORMANCE</div>
+    <h2>性能基准</h2>
+    <p>测试平台：Intel i7-8700K @3.70GHz · 16GB RAM · DF100 USB 相机 1280×720@60fps · Windows 10 x64 · MSVC 2019。</p>
+  </div>
+  <div class="bench">
+    <div class="row-b"><div class="lbl">简单背景</div>
+      <div class="track"><div class="fill f1" data-w="100">8 ms / 帧</div></div><div class="fps">≥ 125 FPS</div></div>
+    <div class="row-b"><div class="lbl">复杂背景</div>
+      <div class="track"><div class="fill f2" data-w="53.6">15 ms / 帧</div></div><div class="fps">≥ 67 FPS</div></div>
+    <div class="row-b"><div class="lbl">多目标识别</div>
+      <div class="track"><div class="fill f3" data-w="32">25 ms / 帧</div></div><div class="fps">≥ 40 FPS</div></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:26px">
+    <div class="card"><div class="ico">◈ 吞吐</div><h3>队列与内存</h3>
+      <p>处理队列上限 5 帧，队列满时丢弃旧帧而非阻塞；图像处理以移动语义传递，避免频繁 clone。</p></div>
+    <div class="card"><div class="ico">◈ 并发</div><h3>线程协作</h3>
+      <p>采集 / 处理 / 渲染三线程，条件变量 + 原子变量同步，退出时先置标志再 notify 回收。</p></div>
+    <div class="card"><div class="ico">◈ 降级</div><h3>自适应处理</h3>
+      <p>FPS 低于阈值切换到 <code>minAreaRect</code> 简化链路（固定 3×3 核、单次 OPEN），并放宽几何约束保帧率。</p></div>
+    <div class="card"><div class="ico">◈ 度量</div><h3>FPS 统计</h3>
+      <p>10 次滑动平均 + EMA 平滑双重处理，数值基于实际处理耗时而非单纯计数，避免抖动。</p></div>
+  </div>
+</section>
+
+<!-- ═══ 结构 ═══ -->
+<section id="structure" class="rise">
+  <div class="sec-head">
+    <div class="sec-no">06 / STRUCTURE</div>
+    <h2>项目结构</h2>
+    <p>按职责划分为图像核心、相机、界面、配置四个模块，头文件即接口契约。</p>
+  </div>
+  <div class="grid g2">
+    <div class="tree">
+<div><span class="dir">RM-Armor-Visor/</span></div>
+<div><span class="ind">├─ </span><span class="file">CMakeLists.txt</span>        <span class="cmt"># 构建配置与 OpenCV 链接</span></div>
+<div><span class="ind">├─ </span><span class="file">build.ps1</span>             <span class="cmt"># Windows 一键构建（MinGW）</span></div>
+<div><span class="ind">├─ </span><span class="file">run.ps1</span>               <span class="cmt"># 构建后启动</span></div>
+<div><span class="ind">├─ </span><span class="dir">src/</span></div>
+<div><span class="ind">│  ├─ </span><span class="file">main.cpp</span>          <span class="cmt"># 主循环 / 线程 / 键位 / Demo 回退</span></div>
+<div><span class="ind">│  ├─ </span><span class="dir">core/</span></div>
+<div><span class="ind">│  │  ├─ </span><span class="file">ImageProcessor.h / .cpp</span></div>
+<div><span class="ind">│  ├─ </span><span class="dir">camera/</span></div>
+<div><span class="ind">│  │  ├─ </span><span class="file">CameraManager.h / .cpp</span></div>
+<div><span class="ind">│  ├─ </span><span class="dir">ui/</span></div>
+<div><span class="ind">│  │  ├─ </span><span class="file">UIController.h / .cpp</span></div>
+<div><span class="ind">│  └─ </span><span class="dir">utils/</span></div>
+<div><span class="ind">│     ├─ </span><span class="file">ConfigManager.h / .cpp</span></div>
+<div><span class="ind">└─ </span><span class="dir">dosc/</span>               <span class="cmt"># 文档与 Suzuki85 边界跟踪论文</span></div>
+    </div>
+    <div>
+      <table class="tbl mod" style="margin-top:0">
+        <thead><tr><th style="width:150px">模块</th><th>职责</th></tr></thead>
+        <tbody>
+          <tr><td>ImageProcessor</td><td>预处理、颜色分割、形态学、灯条筛选与配对打分、ROI 跟踪状态。</td></tr>
+          <tr><td>CameraManager</td><td>VideoCapture 生命周期、分辨率 / 帧率设定、曝光与增益、三档环境条件预设。</td></tr>
+          <tr><td>UIController</td><td>静态 HUD 层缓存、动态叠加、Toast 提示、自绘控制面板与鼠标拖拽逻辑。</td></tr>
+          <tr><td>ConfigManager</td><td>YAML 读写，把 HSV 阈值、过滤参数与相机参数序列化到 cv::FileStorage。</td></tr>
+          <tr><td>main.cpp</td><td>参数解析、双线程调度、帧队列、自适应策略、录像与截图。</td></tr>
+        </tbody>
+      </table>
+      <div class="card" style="margin-top:16px">
+        <div class="ico">◇ 提示</div>
+        <h3 style="margin:10px 0 8px">常见问题</h3>
+        <p>识别率低时优先降低曝光并收紧 HSV；opencv_world 相关崩溃先确认链接库版本一致；
+        Linux 下摄像头打不开可检查 <code>/dev/video*</code> 权限与占用情况。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>RM-ARMOR-VISOR · ArmorDetector v2.0 · C++ / OpenCV4</span>
+    <span><a href="https://github.com/yohoten/RM-Armor-Visor" target="_blank" rel="noopener">github.com/yohoten/RM-Armor-Visor ↗</a></span>
+  </div>
+</footer>
+</div>
+
+<script>
+/* ── 滚动淡入 ── */
+const io = new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: .12 });
+document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+/* ── 构建标签页 ── */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.pane').forEach(x => x.classList.remove('on'));
+  t.classList.add('on');
+  document.getElementById(t.dataset.pane).classList.add('on');
+}));
+
+/* ── 复制按钮 ── */
+document.querySelectorAll('.copy').forEach(b => b.addEventListener('click', async () => {
+  const code = b.closest('.code').querySelector('pre').innerText;
+  try { await navigator.clipboard.writeText(code); } catch (_) {}
+  const old = b.textContent; b.textContent = '已复制 ✓'; b.style.color = 'var(--cyan)';
+  setTimeout(() => { b.textContent = old; b.style.color = ''; }, 1400);
+}));
+
+/* ── 性能条动画 ── */
+const bo = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) {
+    e.target.querySelectorAll('.fill').forEach(f => { f.style.width = f.dataset.w + '%'; });
+    bo.unobserve(e.target);
+  }
+}), { threshold: .35 });
+document.querySelectorAll('.bench').forEach(el => bo.observe(el));
+
+/* ── HUD 演示动画 ── */
+(function () {
+  const cv = document.getElementById('visor');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const fpsOut = document.getElementById('fpsOut');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const drawings = [];
+  const RED = '#ff3b52', BLUE = '#3d8cff', CYAN = '#00e5c0';
+  let t = 0, lastFpsPaint = 0;
+
+  function glowText(txt, x, y, color, size, align) {
+    ctx.font = '600 ' + size + 'px ui-monospace, Menlo, Consolas, monospace';
+    ctx.textAlign = align || 'left';
+    ctx.lineWidth = Math.max(2, size / 5);
+    ctx.strokeStyle = 'rgba(0,0,0,.85)';
+    ctx.strokeText(txt, x, y);
+    ctx.fillStyle = color;
+    ctx.fillText(txt, x, y);
+  }
+
+  function brackets(r, color, len) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2.4; ctx.lineCap = 'square';
+    const { x, y, w, h } = r;
+    const segs = [
+      [x, y + len, x, y], [x, y, x + len, y],
+      [x + w, y, x + w - len, y], [x + w, y, x + w, y + len],
+      [x, y + h, x, y + h - len], [x, y + h, x + len, y + h],
+      [x + w, y + h, x + w - len, y + h], [x + w, y + h, x + w, y + h - len]
+    ];
+    segs.forEach(s => { ctx.beginPath(); ctx.moveTo(s[0], s[1]); ctx.lineTo(s[2], s[3]); ctx.stroke(); });
+  }
+
+  function infoCard(armor, color, cp) {
+    const cw = 176, ch = 88;
+    ctx.fillStyle = 'rgba(6,8,12,.86)'; ctx.fillRect(cp.x, cp.y, cw, ch);
+    ctx.fillStyle = color; ctx.fillRect(cp.x, cp.y, 4, ch);
+    ctx.strokeStyle = 'rgba(120,140,160,.35)'; ctx.lineWidth = 1;
+    ctx.strokeRect(cp.x + .5, cp.y + .5, cw - 1, ch - 1);
+    glowText(armor.color.toUpperCase() + '  ' + Math.round(armor.conf * 100) + '%', cp.x + 15, cp.y + 22, '#dfe8f0', 15);
+    const bx = cp.x + 15, bw = cw - 30, fw = bw * armor.conf;
+    ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fillRect(bx, cp.y + 30, bw, 5);
+    ctx.fillStyle = armor.conf > .7 ? '#00ff78' : armor.conf > .4 ? '#00dcff' : '#ffb400';
+    ctx.fillRect(bx, cp.y + 30, fw, 5);
+    ctx.font = '13px ui-monospace, Menlo, Consolas, monospace'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#b6c4d2';
+    ctx.fillText('X:' + Math.round(armor.cx) + '  Y:' + Math.round(armor.cy), bx, cp.y + 52);
+    ctx.fillText('W:' + armor.w + '  H:' + armor.h, bx, cp.y + 68);
+    ctx.fillStyle = '#8a99a8';
+    ctx.fillText('OFF ' + (armor.dx >= 0 ? '+' : '') + armor.dx + '  ' + (armor.dy >= 0 ? '+' : '') + armor.dy, bx, cp.y + 82);
+  }
+
+  function crosshair() {
+    const cx = W / 2, cy = H / 2;
+    ctx.strokeStyle = 'rgba(0,229,192,.55)'; ctx.lineWidth = 1.2;
+    [80, 28].forEach(r => { ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke(); });
+    ctx.strokeStyle = 'rgba(170,180,190,.5)';
+    for (let i = 0; i < 8; i++) {
+      const a = i * Math.PI / 4, len = i % 2 ? 8 : 16;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a) * 80, cy + Math.sin(a) * 80);
+      ctx.lineTo(cx + Math.cos(a) * (80 - len), cy + Math.sin(a) * (80 - len));
+      ctx.stroke();
+    }
+    ctx.strokeStyle = CYAN; ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(cx - 38, cy); ctx.lineTo(cx - 10, cy);
+    ctx.moveTo(cx + 10, cy); ctx.lineTo(cx + 38, cy);
+    ctx.moveTo(cx, cy - 38); ctx.lineTo(cx, cy - 10);
+    ctx.moveTo(cx, cy + 10); ctx.lineTo(cx, cy + 38);
+    ctx.stroke();
+    ctx.fillStyle = CYAN; ctx.beginPath(); ctx.arc(cx, cy, 2.2, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function topBar(count, armed) {
+    const g = ctx.createLinearGradient(0, 0, 0, 40);
+    g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,.05)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, 40);
+    ctx.strokeStyle = 'rgba(0,200,180,.7)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, 39.5); ctx.lineTo(W, 39.5); ctx.stroke();
+    glowText('TGT ' + count, 18, 27, count ? '#00ffc8' : '#78848f', 20);
+    glowText('R1', 132, 27, '#00ff64', 20);
+    glowText(armed ? 'ARMED' : 'SAFE', 236, 27, armed ? '#00ff50' : '#ff503c', 20);
+    const d = new Date();
+    const clock = [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
+    glowText(clock, W - 20, 27, '#c8d2dc', 19, 'right');
+  }
+
+  function bottomBar() {
+    const bh = 26, y = H - bh;
+    ctx.fillStyle = 'rgba(10,12,16,.92)'; ctx.fillRect(0, y, W, bh);
+    ctx.strokeStyle = 'rgba(0,180,160,.6)'; ctx.beginPath();
+    ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke();
+    const keys = ['^Q:QUIT', 'S:UI', 'B:BIN', 'R:NEW', 'A:ARM', 'F:FIN', '1-3:EXP', 'V:REC', 'SPC:SHT'];
+    ctx.font = '14px ui-monospace, Menlo, Consolas, monospace';
+    ctx.fillStyle = 'rgba(175,185,196,.85)'; ctx.textAlign = 'left';
+    keys.forEach((k, i) => ctx.fillText(k, 22 + i * 138, H - 8));
+  }
+
+  function makeTarget(base, spread, amp, phase, color, name, yBase) {
+    const cx = base + Math.sin(t * phase) * amp;
+    const cy = yBase + Math.cos(t * phase * .7) * 40;
+    const bh = 52 + Math.sin(t * phase * 1.3) * 5;
+    const w = 34, gap = spread;
+    return {
+      bars: [
+        { x: cx - gap / 2 - w, y: cy - bh / 2, w: w, h: bh },
+        { x: cx + gap / 2, y: cy - bh / 2, w: w, h: bh }
+      ],
+      cx, cy, gap, bh, color, name,
+      conf: .72 + Math.sin(t * phase * .9) * .2
+    };
+  }
+
+  function frame() {
+    t = reduce ? 1 : t + 1;
+    ctx.fillStyle = '#070a10'; ctx.fillRect(0, 0, W, H);
+
+    // 网格
+    ctx.strokeStyle = 'rgba(120,160,180,.055)'; ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 64) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 64) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+    const targets = [
+      makeTarget(720, 150, 190, .012, RED, 'red', 300),
+      makeTarget(360, 116, 150, .019, BLUE, 'blue', 520)
+    ];
+
+    targets.forEach(tg => {
+      // 灯条
+      ctx.shadowColor = tg.color; ctx.shadowBlur = 26;
+      ctx.fillStyle = tg.color;
+      tg.bars.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+      ctx.shadowBlur = 0;
+
+      const box = {
+        x: tg.bars[0].x - 12, y: tg.bars[0].y - 12,
+        w: tg.gap + tg.bars[0].w + 24, h: tg.bh + 24
+      };
+      brackets(box, tg.color, 24);
+
+      // 中心十字
+      ctx.strokeStyle = tg.color; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(tg.cx, tg.cy, 8, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(tg.cx - 12, tg.cy); ctx.lineTo(tg.cx + 12, tg.cy);
+      ctx.moveTo(tg.cx, tg.cy - 12); ctx.lineTo(tg.cx, tg.cy + 12);
+      ctx.stroke();
+
+      // 到准星的虚线
+      ctx.save();
+      ctx.setLineDash([9, 11]);
+      ctx.strokeStyle = tg.color + '99'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(tg.cx, tg.cy); ctx.lineTo(W / 2, H / 2); ctx.stroke();
+      ctx.restore();
+
+      infoCard({
+        color: tg.name, conf: Math.max(.35, Math.min(.99, tg.conf)),
+        cx: tg.cx, cy: tg.cy,
+        w: Math.round(box.w), h: Math.round(box.h),
+        dx: Math.round(tg.cx - W / 2), dy: Math.round(H / 2 - tg.cy)
+      }, tg.color, { x: Math.min(box.x + box.w + 16, W - 192), y: box.y });
+    });
+
+    crosshair();
+
+    // 暗角 + 扫描线
+    const vig = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .95);
+    vig.addColorStop(0, 'rgba(0,0,0,0)'); vig.addColorStop(1, 'rgba(0,0,0,.62)');
+    ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(0,0,0,.14)';
+    for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
+
+    topBar(targets.length, true);
+    bottomBar();
+
+    if (!reduce && t - lastFpsPaint > 24) {
+      lastFpsPaint = t;
+      const f = 60 + Math.round(Math.sin(t * .05) * 3);
+      fpsOut.textContent = 'FPS ' + f + '  ·  TGT ' + targets.length;
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
